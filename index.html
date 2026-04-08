@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Davis Center for Oral and Maxillofacial Surgery</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pri:#3A7CA5; --sec:#1F3A5F; --bg:#fff; --surf:#F4F6F8;
+  --acc:#6FB3B8; --txt:#2E2E2E; --lt:#6b7a8d; --bdr:#d4dde6;
+  --ok:#2e8b57; --err:#c0392b; --warn:#e67e22;
+  --r:8px; --r2:14px;
+  --sh:0 2px 14px rgba(31,58,95,.09);
+  --shl:0 8px 36px rgba(31,58,95,.16);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+.view{display:none;flex-direction:column;flex:1;min-height:100vh}
+.view.active{display:flex}
+
+/* LANDING */
+#vLand{background:var(--sec);position:relative;overflow:hidden}
+.lbg{position:absolute;inset:0;background:
+  radial-gradient(ellipse at 18% 55%,rgba(58,124,165,.28) 0%,transparent 60%),
+  radial-gradient(ellipse at 82% 18%,rgba(111,179,184,.22) 0%,transparent 50%),
+  linear-gradient(155deg,#1F3A5F 0%,#0d1e38 100%)}
+.lcont{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:60px 24px 100px;text-align:center}
+.lembl{width:78px;height:78px;background:rgba(58,124,165,.25);border:2px solid rgba(111,179,184,.45);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;font-size:2rem}
+.ltitle{font-family:'Libre Baskerville',serif;font-size:2rem;font-weight:700;color:#fff;line-height:1.2;max-width:530px;margin:0 auto}
+.ldiv{width:56px;height:2px;background:var(--acc);margin:18px auto}
+.ldoc{font-family:'Libre Baskerville',serif;font-size:1.05rem;color:rgba(255,255,255,.82);font-style:italic;margin-bottom:44px}
+.lbtns{display:flex;flex-direction:column;gap:13px;width:100%;max-width:310px}
+.btnPL{background:var(--pri);color:#fff;border:none;padding:15px 32px;border-radius:var(--r);font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:all .2s;box-shadow:0 4px 20px rgba(58,124,165,.4)}
+.btnPL:hover{background:#2d6a8f;transform:translateY(-1px)}
+.btnSL{background:transparent;color:#fff;border:2px solid rgba(111,179,184,.6);padding:13px 32px;border-radius:var(--r);font-family:'Nunito',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btnSL:hover{border-color:var(--acc);background:rgba(111,179,184,.1)}
+.adminBtn{position:fixed;bottom:22px;right:22px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.55);padding:7px 16px;border-radius:var(--r);font-family:'Nunito',sans-serif;font-size:.78rem;cursor:pointer;transition:all .2s;z-index:10}
+.adminBtn:hover{background:rgba(255,255,255,.18);color:#fff}
+.lfooter{position:absolute;bottom:0;left:0;right:0;text-align:center;padding:15px 24px;background:rgba(0,0,0,.28);color:rgba(255,255,255,.6);font-size:.78rem;line-height:1.8;z-index:2}
+.lfooter a{color:var(--acc);text-decoration:none}
+
+/* PAGE HEADER */
+.phdr{background:var(--sec);color:#fff;text-align:center;padding:17px 24px;position:relative;flex-shrink:0}
+.phdr .logo{font-family:'Libre Baskerville',serif;font-size:.98rem;font-weight:700;letter-spacing:.02em}
+.phdr .sub{font-size:.78rem;opacity:.72;margin-top:2px}
+.backBtn{position:absolute;left:14px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.13);border:none;color:#fff;padding:6px 13px;border-radius:var(--r);cursor:pointer;font-family:'Nunito',sans-serif;font-size:.78rem;transition:background .2s}
+.backBtn:hover{background:rgba(255,255,255,.24)}
+
+/* PROGRESS BAR */
+.prog{display:flex;align-items:center;justify-content:center;padding:13px 18px;background:var(--surf);border-bottom:1px solid var(--bdr);gap:0;overflow-x:auto;flex-shrink:0}
+.pstep{display:flex;align-items:center;white-space:nowrap}
+.pbub{width:27px;height:27px;border-radius:50%;background:var(--bdr);color:var(--lt);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.73rem;margin-right:5px;flex-shrink:0;transition:all .25s}
+.pbub.act{background:var(--pri);color:#fff}
+.pbub.don{background:var(--ok);color:#fff}
+.plbl{font-size:.71rem;color:var(--lt)}
+.plbl.act{color:var(--pri);font-weight:700}
+.plbl.don{color:var(--ok)}
+.pline{width:20px;height:2px;background:var(--bdr);margin:0 5px;flex-shrink:0;transition:background .25s}
+.pline.don{background:var(--ok)}
+
+/* CONTENT */
+.cw{flex:1;padding:22px 16px 32px;max-width:780px;margin:0 auto;width:100%}
+
+/* CARD */
+.card{background:#fff;border-radius:var(--r2);box-shadow:var(--sh);padding:26px;margin-bottom:18px}
+.chdl h2{font-family:'Libre Baskerville',serif;font-size:1.22rem;color:var(--sec);margin-bottom:5px}
+.chdl p{color:var(--lt);font-size:.87rem;line-height:1.5;margin-bottom:18px}
+
+/* SECTION TITLE */
+.stt{font-size:.73rem;font-weight:700;color:var(--sec);text-transform:uppercase;letter-spacing:.09em;border-bottom:2px solid var(--acc);padding-bottom:6px;margin:20px 0 13px}
+.stt:first-of-type{margin-top:0}
+
+/* FORM GRID */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg3{grid-template-columns:1fr 1fr 1fr}
+.fg1{grid-template-columns:1fr}
+.fd{display:flex;flex-direction:column;gap:4px}
+.fd.full{grid-column:1/-1}
+.fd.c2{grid-column:span 2}
+.lbl{font-size:.72rem;font-weight:700;color:var(--sec);letter-spacing:.04em;text-transform:uppercase}
+.req{color:var(--err)}
+.inp{border:1.5px solid var(--bdr);border-radius:var(--r);padding:9px 12px;font-family:'Nunito',sans-serif;font-size:.89rem;color:var(--txt);background:#fff;transition:border-color .2s,box-shadow .2s;width:100%}
+.inp:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px rgba(58,124,165,.12)}
+.inp[readonly]{background:var(--surf);color:var(--lt);cursor:default}
+select.inp{cursor:pointer}
+textarea.inp{resize:vertical;min-height:76px}
+
+/* Y/N */
+.ynr{display:flex;align-items:center;gap:10px;padding:3px 0}
+.ynl{font-size:.85rem;color:var(--txt);flex:1;line-height:1.4}
+.ynt{display:flex;border-radius:6px;overflow:hidden;border:1.5px solid var(--bdr);flex-shrink:0}
+.ynb{padding:5px 12px;border:none;background:#fff;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;color:var(--lt);transition:all .15s}
+.ynb:first-child{border-right:1px solid var(--bdr)}
+.ynb.sy{background:var(--ok);color:#fff;border-color:var(--ok)}
+.ynb.sn{background:#e8ecf0;color:var(--txt)}
+
+/* CHECKBOX */
+.chk{display:flex;align-items:flex-start;gap:9px;padding:10px 13px;background:var(--surf);border-radius:var(--r);cursor:pointer;margin:5px 0}
+.chk input{margin-top:2px;accent-color:var(--pri);cursor:pointer;width:15px;height:15px;flex-shrink:0}
+.chk label{font-size:.87rem;cursor:pointer;line-height:1.45}
+
+/* POLICY TEXT */
+.pol{background:var(--surf);border-left:3px solid var(--acc);border-radius:0 var(--r) var(--r) 0;padding:13px 15px;font-size:.78rem;line-height:1.65;color:var(--txt);margin:12px 0;max-height:220px;overflow-y:auto}
+
+/* CONDITIONS GRID */
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ci{display:flex;align-items:center;gap:8px;padding:7px 9px;background:var(--surf);border-radius:var(--r);font-size:.78rem;line-height:1.3}
+.ci .ynt{margin-left:auto;flex-shrink:0}
+.ci .ynb{padding:4px 9px;font-size:.72rem}
+
+/* SIGNATURE */
+.ssec{margin-top:17px;padding-top:17px;border-top:1px solid var(--bdr)}
+.ssec h4{font-size:.78rem;font-weight:700;color:var(--sec);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
+.swrap{border:1.5px solid var(--bdr);border-radius:var(--r);background:#fff;position:relative}
+.scan{display:block;width:100%;height:110px;cursor:crosshair;border-radius:var(--r);touch-action:none}
+.sph{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#c0c8d4;font-size:.78rem;pointer-events:none;font-style:italic}
+.sctl{display:flex;justify-content:flex-end;margin-top:4px}
+.clrs{background:none;border:1px solid var(--bdr);color:var(--lt);padding:3px 11px;border-radius:4px;font-size:.74rem;cursor:pointer;font-family:'Nunito',sans-serif}
+.clrs:hover{border-color:var(--err);color:var(--err)}
+.sdrow{display:flex;justify-content:flex-end;margin-top:7px}
+.sdrow .fd{min-width:155px}
+
+/* BUTTONS */
+.btn{padding:10px 21px;border-radius:var(--r);font-family:'Nunito',sans-serif;font-weight:700;font-size:.89rem;cursor:pointer;transition:all .2s;border:none;letter-spacing:.02em}
+.bP{background:var(--pri);color:#fff}
+.bP:hover{background:#2d6a8f}
+.bS{background:var(--surf);color:var(--sec);border:1.5px solid var(--bdr)}
+.bS:hover{background:#e2e8ef}
+.bG{background:var(--ok);color:#fff}
+.bG:hover{background:#27704a}
+.bA{background:var(--acc);color:#fff}
+.bA:hover{background:#5a9ca1}
+.bD{background:var(--err);color:#fff}
+.snav{display:flex;justify-content:space-between;padding:16px 0 4px;gap:10px}
+.snav .btn{flex:1;max-width:190px}
+.ml{margin-left:auto}
+
+/* ALERTS */
+.alert{padding:10px 14px;border-radius:var(--r);font-size:.85rem;margin:9px 0}
+.ae{background:#fdecea;border-left:3px solid var(--err);color:#922b21}
+.ao{background:#e9f7ef;border-left:3px solid var(--ok);color:#196f3d}
+.ai{background:#eaf4fc;border-left:3px solid var(--pri);color:#1a5276}
+
+/* FORM LIST */
+.flist{display:flex;flex-direction:column;gap:9px}
+.fi{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;background:var(--surf);border-radius:var(--r);border:1px solid var(--bdr);border-left:4px solid var(--bdr)}
+.fi.done{border-left-color:var(--ok)}
+.fi.pend{border-left-color:var(--warn)}
+.fi h4{font-size:.9rem;font-weight:700;color:var(--sec)}
+.fi p{font-size:.75rem;color:var(--lt);margin-top:2px}
+
+/* ADMIN */
+.ahdr{display:flex;align-items:center;justify-content:space-between;padding:13px 22px;background:var(--sec);color:#fff;flex-shrink:0}
+.ahdr h2{font-family:'Libre Baskerville',serif;font-size:1.02rem}
+.ptbl{width:100%;border-collapse:collapse;font-size:.85rem}
+.ptbl th{background:var(--sec);color:#fff;padding:10px 13px;text-align:left;font-size:.73rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.ptbl td{padding:10px 13px;border-bottom:1px solid var(--bdr);vertical-align:middle}
+.ptbl tr:hover td{background:#f0f4f8}
+.bdg{padding:2px 9px;border-radius:12px;font-size:.68rem;font-weight:700}
+.bd{background:#d5f5e3;color:#196f3d}
+.bp{background:#fef9e7;color:#7d6608}
+
+/* COMPLETION */
+.comp{text-align:center;padding:54px 24px}
+.cico{width:66px;height:66px;background:#d5f5e3;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.9rem;margin:0 auto 20px}
+.comp h2{font-family:'Libre Baskerville',serif;color:var(--sec);font-size:1.42rem;margin-bottom:10px}
+.comp p{color:var(--lt);max-width:400px;margin:0 auto 10px;line-height:1.6;font-size:.9rem}
+
+/* FOOTER */
+.pgft{background:var(--sec);color:rgba(255,255,255,.6);text-align:center;padding:13px 22px;font-size:.76rem;line-height:1.8;flex-shrink:0}
+.pgft a{color:var(--acc);text-decoration:none}
+
+/* UTIL */
+.hidden{display:none!important}
+.tblwrap{overflow-x:auto}
+
+@media(max-width:600px){
+  .fg,.fg3{grid-template-columns:1fr}
+  .cgrid{grid-template-columns:1fr}
+  .fd.c2{grid-column:span 1}
+  .ltitle{font-size:1.55rem}
+  .card{padding:17px}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== LANDING ===== -->
+<div id="vLand" class="view active">
+  <div class="lbg"></div>
+  <div class="lcont">
+    <div class="lembl">🦷</div>
+    <h1 class="ltitle">Davis Center for Oral and Maxillofacial Surgery</h1>
+    <div class="ldiv"></div>
+    <p class="ldoc">Paul Benson, DMD, MD</p>
+    <div class="lbtns">
+      <button class="btnPL" onclick="gotoEmail('intake')">Become a Patient</button>
+      <button class="btnSL" onclick="gotoEmail('view')">View Forms</button>
+    </div>
+  </div>
+  <div class="lfooter">
+    <strong>Davis Center for Oral and Maxillofacial Surgery</strong><br>
+    890 W Heritage Park Blvd, Suite 103 · Layton, Utah 84041<br>
+    (801) 614-0999 · <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a>
+  </div>
+  <button class="adminBtn" onclick="showV('vAdminLogin')">Admin</button>
+</div>
+
+<!-- ===== EMAIL ENTRY ===== -->
+<div id="vEmail" class="view">
+  <div class="phdr">
+    <button class="backBtn" onclick="showV('vLand')">← Back</button>
+    <div class="logo">Davis Center for Oral and Maxillofacial Surgery</div>
+    <div class="sub">Paul Benson, DMD, MD</div>
+  </div>
+  <div class="cw" style="display:flex;align-items:center;flex:1;max-width:480px">
+    <div class="card" style="width:100%">
+      <div class="chdl">
+        <h2 id="emailTitle">Welcome</h2>
+        <p id="emailSub">Enter your email address to continue.</p>
+      </div>
+      <div class="fd" style="margin-bottom:13px">
+        <label class="lbl">Email Address</label>
+        <input type="email" class="inp" id="inEmail" placeholder="you@example.com"
+               onkeypress="if(event.key==='Enter')doEmail()">
+      </div>
+      <div id="emailErr" class="alert ae hidden"></div>
+      <button class="btn bP" style="width:100%" onclick="doEmail()">Continue →</button>
+    </div>
+  </div>
+  <div class="pgft">Davis Center for Oral and Maxillofacial Surgery · 890 W Heritage Park Blvd, Suite 103 · Layton, Utah 84041<br>
+  (801) 614-0999 · <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a></div>
+</div>
+
+<!-- ===== INTAKE WIZARD ===== -->
+<div id="vIntake" class="view">
+  <div class="phdr">
+    <button class="backBtn" onclick="showV('vLand')">← Home</button>
+    <div class="logo">Patient Intake Forms</div>
+    <div class="sub">Davis Center for Oral and Maxillofacial Surgery</div>
+  </div>
+
+  <div class="prog" id="progBar">
+    <div class="pstep"><div class="pbub act" id="pb1">1</div><span class="plbl act" id="pl1">Patient Info</span></div>
+    <div class="pline" id="pc1"></div>
+    <div class="pstep"><div class="pbub" id="pb2">2</div><span class="plbl" id="pl2">Insurance</span></div>
+    <div class="pline" id="pc2"></div>
+    <div class="pstep"><div class="pbub" id="pb3">3</div><span class="plbl" id="pl3">Health History</span></div>
+    <div class="pline" id="pc3"></div>
+    <div class="pstep"><div class="pbub" id="pb4">4</div><span class="plbl" id="pl4">HIPAA</span></div>
+  </div>
+
+  <div class="cw">
+
+    <!-- STEP 1 -->
+    <div id="s1">
+      <div class="card">
+        <div class="chdl"><h2>Patient Information</h2><p>Please complete all fields accurately. This information helps us provide the best possible care.</p></div>
+
+        <div class="stt">Referral Information</div>
+        <div class="fg">
+          <div class="fd full"><div class="ynr"><span class="ynl">Have you or any family been treated here before?</span><div class="ynt"><button class="ynb" data-f="treated_before" data-v="yes" onclick="setYN(this)">YES</button><button class="ynb" data-f="treated_before" data-v="no" onclick="setYN(this)">NO</button></div></div></div>
+          <div class="fd hidden" id="g_treated_who"><label class="lbl">Who was treated?</label><input class="inp" id="f_treated_who"></div>
+          <div class="fd"><label class="lbl">Referred By</label><input class="inp" id="f_referred_by"></div>
+          <div class="fd"><label class="lbl">Dentist</label><input class="inp" id="f_dentist"></div>
+          <div class="fd"><label class="lbl">Orthodontist</label><input class="inp" id="f_orthodontist"></div>
+        </div>
+
+        <div class="stt">Patient Information</div>
+        <div class="fg">
+          <div class="fd c2"><label class="lbl">Patient's Full Name <span class="req">*</span></label><input class="inp" id="f_name" placeholder="First Middle Last"></div>
+          <div class="fd"><label class="lbl">Social Security # (SSN)</label><input class="inp" id="f_ssn" placeholder="XXX-XX-XXXX" maxlength="11"></div>
+          <div class="fd"><label class="lbl">Date of Birth <span class="req">*</span></label><input type="date" class="inp" id="f_dob"></div>
+          <div class="fd"><label class="lbl">Age</label><input type="number" class="inp" id="f_age" min="0" max="130"></div>
+          <div class="fd"><label class="lbl">Sex</label><select class="inp" id="f_sex"><option value="">Select…</option><option>Male</option><option>Female</option><option>Other</option><option>Prefer not to say</option></select></div>
+          <div class="fd"><label class="lbl">Marital Status</label><select class="inp" id="f_marital"><option value="">Select…</option><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option><option>Separated</option></select></div>
+          <div class="fd"><label class="lbl">Cell Phone <span class="req">*</span></label><input type="tel" class="inp" id="f_cell" placeholder="(801) 555-0000"></div>
+          <div class="fd"><label class="lbl">Alternate Phone</label><input type="tel" class="inp" id="f_alt_phone"></div>
+          <div class="fd full"><div class="ynr"><span class="ynl">May we leave a voicemail?</span><div class="ynt"><button class="ynb" data-f="voicemail" data-v="yes" onclick="setYN(this)">YES</button><button class="ynb" data-f="voicemail" data-v="no" onclick="setYN(this)">NO</button></div></div></div>
+          <div class="fd c2"><label class="lbl">Email Address <span class="req">*</span></label><input type="email" class="inp" id="f_email"></div>
+          <div class="fd full"><div class="ynr"><span class="ynl">May we email you information?</span><div class="ynt"><button class="ynb" data-f="email_info" data-v="yes" onclick="setYN(this)">YES</button><button class="ynb" data-f="email_info" data-v="no" onclick="setYN(this)">NO</button></div></div></div>
+          <div class="fd full"><label class="lbl">Home Address</label><input class="inp" id="f_addr"></div>
+          <div class="fd"><label class="lbl">City</label><input class="inp" id="f_city"></div>
+          <div class="fd"><label class="lbl">State</label><input class="inp" id="f_state" maxlength="2" placeholder="UT"></div>
+          <div class="fd"><label class="lbl">Zip Code</label><input class="inp" id="f_zip" placeholder="84041"></div>
+          <div class="fd"><label class="lbl">Employer / School</label><input class="inp" id="f_employer"></div>
+          <div class="fd"><label class="lbl">Work Phone</label><input type="tel" class="inp" id="f_work_phone"></div>
+          <div class="fd"><label class="lbl">Occupation</label><input class="inp" id="f_occ"></div>
+          <div class="fd full"><div class="ynr"><span class="ynl">May we contact you at work?</span><div class="ynt"><button class="ynb" data-f="work_contact" data-v="yes" onclick="setYN(this)">YES</button><button class="ynb" data-f="work_contact" data-v="no" onclick="setYN(this)">NO</button></div></div></div>
+          <div class="fd full"><label class="lbl">Work Address</label><input class="inp" id="f_work_addr"></div>
+          <div class="fd"><label class="lbl">Work City</label><input class="inp" id="f_work_city"></div>
+          <div class="fd"><label class="lbl">Work State</label><input class="inp" id="f_work_state" maxlength="2"></div>
+          <div class="fd"><label class="lbl">Work Zip</label><input class="inp" id="f_work_zip"></div>
+          <div class="fd full"><div class="ynr"><span class="ynl">May we share your information with a family member?</span><div class="ynt"><button class="ynb" data-f="share_family" data-v="yes" onclick="setYN(this)">YES</button><button class="ynb" data-f="share_family" data-v="no" onclick="setYN(this)">NO</button></div></div></div>
+          <div class="fd c2 hidden" id="g_share_who"><label class="lbl">If yes, who?</label><input class="inp" id="f_share_who"></div>
+        </div>
+
+        <div class="stt">Emergency Contact <small style="text-transform:none;font-weight:400;font-size:.85em">(person not living with you)</small></div>
+        <div class="fg fg3">
+          <div class="fd"><label class="lbl">Name</label><input class="inp" id="f_ec_name"></div>
+          <div class="fd"><label class="lbl">Relationship</label><input class="inp" id="f_ec_rel" placeholder="e.g. Spouse, Parent"></div>
+          <div class="fd"><label class="lbl">Phone</label><input type="tel" class="inp" id="f_ec_phone"></div>
+        </div>
+
+        <div class="stt">Responsible Party <small style="text-transform:none;font-weight:400;font-size:.85em">(if patient is under 18 — otherwise leave blank)</small></div>
+        <div class="fg">
+          <div class="fd c2"><label class="lbl">Responsible Party Name</label><input class="inp" id="f_rp_name" placeholder="Leave blank if patient is 18+"></div>
+          <div class="fd"><label class="lbl">SSN</label><input class="inp" id="f_rp_ssn"></div>
+          <div class="fd"><label class="lbl">Date of Birth</label><input type="date" class="inp" id="f_rp_dob"></div>
+          <div class="fd"><label class="lbl">Age</label><input type="number" class="inp" id="f_rp_age" min="0"></div>
+          <div class="fd"><label class="lbl">Sex</label><select class="inp" id="f_rp_sex"><option value="">Select…</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+          <div class="fd"><label class="lbl">Marital Status</label><select class="inp" id="f_rp_marital"><option value="">Select…</option><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option></select></div>
+          <div class="fd"><label class="lbl">Cell Phone</label><input type="tel" class="inp" id="f_rp_cell"></div>
+          <div class="fd"><label class="lbl">Alternate Phone</label><input type="tel" class="inp" id="f_rp_alt"></div>
+          <div class="fd full"><label class="lbl">Home Address</label><input class="inp" id="f_rp_addr"></div>
+          <div class="fd"><label class="lbl">City</label><input class="inp" id="f_rp_city"></div>
+          <div class="fd"><label class="lbl">State</label><input class="inp" id="f_rp_state" maxlength="2"></div>
+          <div class="fd"><label class="lbl">Zip</label><input class="inp" id="f_rp_zip"></div>
+          <div class="fd"><label class="lbl">Employer / School</label><input class="inp" id="f_rp_employer"></div>
+          <div class="fd"><label class="lbl">Work Phone</label><input type="tel" class="inp" id="f_rp_wphone"></div>
+          <div class="fd"><label class="lbl">Occupation</label><input class="inp" id="f_rp_occ"></div>
+          <div class="fd full"><label class="lbl">Work Address</label><input class="inp" id="f_rp_waddr"></div>
+          <div class="fd"><label class="lbl">Work City</label><input class="inp" id="f_rp_wcity"></div>
+          <div class="fd"><label class="lbl">Work State</label><input class="inp" id="f_rp_wstate" maxlength="2"></div>
+          <div class="fd"><label class="lbl">Work Zip</label><input class="inp" id="f_rp_wzip"></div>
+        </div>
+
+        <div class="stt">Financial Agreement &amp; Authorization</div>
+        <div class="pol">Please remember that insurance is considered a method of reimbursing the patient for fees paid to the doctor and is not a substitute for payment. Some companies may pay fixed allowances for certain procedures; they sometimes refer to these as "Reasonable and customary fees." We do not accept this as payment in full (unless otherwise restricted by law or agreement we may have with your insurer). Also some of the insurance companies only pay a percentage of the charge. It is your responsibility to pay any deductible amount, co-insurance or any other balance not paid for by your insurance. IN ORDER TO CONTROL YOUR COST OF BILLINGS, WE DO REQUEST THAT OUR CHARGE FOR OFFICE VISIT BE PAID AT THE INITIATION OF EACH VISIT. Delinquent accounts will be charged an interest rate of 1.5% per month (18% per annum). In the event the account is turned over for collection, the undersigned further agrees to pay court costs and reasonable attorney's fees in addition to the collection fee. I also authorize us to call you at any number you provide or at any number we reasonably believe we can contact you, including calls to mobile, cellular, or similar devices for any lawful purpose. I hereby assign all medical/dental and/or surgical benefits to: Davis Center for Oral and Maxillofacial Surgery, 890 W. Heritage Park Blvd., Suite 103, Layton, UT 84041. This assignment is to be considered as valid as an original. I hereby authorize said assignee to release all information necessary to secure the payment, via Fax Transmittal, electronic, or hard copy.</div>
+        <div class="ssec">
+          <h4>Financial Agreement — Signature (must be 18 or older)</h4>
+          <div class="swrap"><canvas id="sigFin" class="scan"></canvas><div class="sph" id="phFin">Sign here</div></div>
+          <div class="sctl"><button class="clrs" onclick="clrSig('sigFin')">Clear</button></div>
+          <div class="sdrow"><div class="fd"><label class="lbl">Date</label><input type="date" class="inp" id="f_fin_dt"></div></div>
+        </div>
+        <div class="ssec" style="margin-top:16px">
+          <h4>Privacy Practices Acknowledgment — Signature (must be 18 or older)</h4>
+          <p style="font-size:.79rem;color:var(--lt);margin-bottom:7px">I have been given a copy of Davis Center for Oral and Maxillofacial Surgery's Privacy Practices Notice.</p>
+          <div class="swrap"><canvas id="sigPriv" class="scan"></canvas><div class="sph" id="phPriv">Sign here</div></div>
+          <div class="sctl"><button class="clrs" onclick="clrSig('sigPriv')">Clear</button></div>
+          <div class="sdrow"><div class="fd"><label class="lbl">Date</label><input type="date" class="inp" id="f_priv_dt"></div></div>
+        </div>
+
+        <div id="err1" class="alert ae hidden"></div>
+        <div class="snav"><div></div><button class="btn bP ml" onclick="saveStep(1)">Save &amp; Continue →</button></div>
+      </div>
+    </div><!-- /s1 -->
+
+    <!-- STEP 2 -->
+    <div id="s2" class="hidden">
+      <div class="card">
+        <div class="chdl"><h2>Insurance Information</h2><p>We will bill your insurance as a courtesy. Please provide accurate information to avoid billing delays.</p></div>
+        <div class="pol">We recognize that your insurance may help you pay for part of your care. Your insurance coverage is a contract between you and your insurance carrier. As a courtesy, we will bill services provided in our office to your insurance carrier if accurate and complete information is provided.</div>
+
+        <div class="stt">Primary Dental Insurance</div>
+        <div class="fg">
+          <div class="fd"><label class="lbl">Name of Policy Holder</label><input class="inp" id="f_pd_holder"></div>
+          <div class="fd"><label class="lbl">SSN #</label><input class="inp" id="f_pd_ssn" placeholder="XXX-XX-XXXX"></div>
+          <div class="fd"><label class="lbl">Date of Birth of Policy Holder</label><input type="date" class="inp" id="f_pd_dob"></div>
+          <div class="fd"><label class="lbl">Policy Holder's Employer</label><input class="inp" id="f_pd_emp"></div>
+          <div class="fd c2"><label class="lbl">Insurance Company Name</label><input class="inp" id="f_pd_co"></div>
+          <div class="fd c2"><label class="lbl">Insurance Company Address</label><input class="inp" id="f_pd_addr"></div>
+          <div class="fd"><label class="lbl">Policy / Subscriber ID #</label><input class="inp" id="f_pd_pol"></div>
+          <div class="fd"><label class="lbl">Group #</label><input class="inp" id="f_pd_grp"></div>
+        </div>
+
+        <div class="stt">Secondary Dental Insurance</div>
+        <div class="fg">
+          <div class="fd"><label class="lbl">Name of Policy Holder</label><input class="inp" id="f_sd_holder"></div>
+          <div class="fd"><label class="lbl">SSN #</label><input class="inp" id="f_sd_ssn"></div>
+          <div class="fd"><label class="lbl">Date of Birth of Policy Holder</label><input type="date" class="inp" id="f_sd_dob"></div>
+          <div class="fd"><label class="lbl">Policy Holder's Employer</label><input class="inp" id="f_sd_emp"></div>
+          <div class="fd c2"><label class="lbl">Insurance Company Name</label><input class="inp" id="f_sd_co"></div>
+          <div class="fd c2"><label class="lbl">Insurance Company Address</label><input class="inp" id="f_sd_addr"></div>
+          <div class="fd"><label class="lbl">Policy / Subscriber ID #</label><input class="inp" id="f_sd_pol"></div>
+          <div class="fd"><label class="lbl">Group #</label><input class="inp" id="f_sd_grp"></div>
+        </div>
+
+        <div class="stt">Primary Medical Insurance</div>
+        <div class="fg">
+          <div class="fd"><label class="lbl">Name of Policy Holder</label><input class="inp" id="f_pm_holder"></div>
+          <div class="fd"><label class="lbl">SSN #</label><input class="inp" id="f_pm_ssn"></div>
+          <div class="fd"><label class="lbl">Date of Birth of Policy Holder</label><input type="date" class="inp" id="f_pm_dob"></div>
+          <div class="fd"><label class="lbl">Policy Holder's Employer</label><input class="inp" id="f_pm_emp"></div>
+          <div class="fd c2"><label class="lbl">Insurance Company Name</label><input class="inp" id="f_pm_co"></div>
+          <div class="fd c2"><label class="lbl">Insurance Company Address</label><input class="inp" id="f_pm_addr"></div>
+          <div class="fd"><label class="lbl">Policy / Subscriber ID #</label><input class="inp" id="f_pm_pol"></div>
+          <div class="fd"><label class="lbl">Group #</label><input class="inp" id="f_pm_grp"></div>
+        </div>
+
+        <div class="stt">Secondary Medical Insurance</div>
+        <div class="fg">
+          <div class="fd"><label class="lbl">Name of Policy Holder</label><input class="inp" id="f_sm_holder"></div>
+          <div class="fd"><label class="lbl">SSN #</label><input class="inp" id="f_sm_ssn"></div>
+          <div class="fd"><label class="lbl">Date of Birth of Policy Holder</label><input type="date" class="inp" id="f_sm_dob"></div>
+          <div class="fd"><label class="lbl">Policy Holder's Employer</label><input class="inp" id="f_sm_emp"></div>
+          <div class="fd c2"><label class="lbl">Insurance Company Name</label><input class="inp" id="f_sm_co"></div>
+          <div class="fd c2"><label class="lbl">Insurance Company Address</label><input class="inp" id="f_sm_addr"></div>
+          <div class="fd"><label class="lbl">Policy / Subscriber ID #</label><input class="inp" id="f_sm_pol"></div>
+          <div class="fd"><label class="lbl">Group #</label><input class="inp" id="f_sm_grp"></div>
+        </div>
+
+        <div class="chk"><input type="checkbox" id="f_no_ins"><label for="f_no_ins">I do not have Dental/Medical insurance that needs to be submitted.</label></div>
+
+        <div class="pol" style="margin-top:13px;font-size:.76rem">It is your responsibility to verify what your insurance coverage will be for any procedure done in our office. Every health/dental insurance policy is different. We suggest that you determine which limitations apply to your particular contract. It is also your responsibility to verify prior-authorization, if required by your carrier, for any procedure. We will be happy to answer any questions you may have.</div>
+
+        <div class="ssec">
+          <h4>Insurance Acknowledgment Signature</h4>
+          <div class="swrap"><canvas id="sigIns" class="scan"></canvas><div class="sph" id="phIns">Sign here</div></div>
+          <div class="sctl"><button class="clrs" onclick="clrSig('sigIns')">Clear</button></div>
+          <div class="sdrow"><div class="fd"><label class="lbl">Date</label><input type="date" class="inp" id="f_ins_dt"></div></div>
+        </div>
+
+        <div id="err2" class="alert ae hidden"></div>
+        <div class="snav">
+          <button class="btn bS" onclick="goStep(1)">← Back</button>
+          <button class="btn bP ml" onclick="saveStep(2)">Save &amp; Continue →</button>
+        </div>
+      </div>
+    </div><!-- /s2 -->
+
+    <!-- STEP 3 -->
+    <div id="s3" class="hidden">
+      <div class="card">
+        <div class="chdl"><h2>Health History</h2><p>This information is kept strictly confidential and helps us provide safe, appropriate care.</p></div>
+
+        <div class="fg">
+          <div class="fd c2"><label class="lbl">Patient Name</label><input class="inp" id="f_hh_name" readonly></div>
+          <div class="fd"><label class="lbl">Date of Birth</label><input type="date" class="inp" id="f_hh_dob" readonly></div>
+          <div class="fd"><label class="lbl">Height</label><input class="inp" id="f_hh_ht" placeholder='e.g. 5&apos;10"'></div>
+          <div class="fd"><label class="lbl">Weight</label><input class="inp" id="f_hh_wt" placeholder="e.g. 170 lbs"></div>
+          <div class="fd full"><div class="ynr"><span class="ynl">Are you now under a physician's care for a particular problem?</span><div class="ynt"><button class="ynb" data-f="physician_care" data-v="yes" onclick="setYN(this)">YES</button><button class="ynb" data-f="physician_care" data-v="no" onclick="setYN(this)">NO</button></div></div></div>
+          <div class="fd hidden" id="g_phys_name"><label class="lbl">Physician Name</label><input class="inp" id="f_phys_name"></div>
+          <div class="fd hidden" id="g_phys_phone"><label class="lbl">Physician Phone</label><input type="tel" class="inp" id="f_phys_phone"></div>
+          <div class="fd full"><div class="ynr"><span class="ynl">Are you in good health?</span><div class="ynt"><button class="ynb" data-f="good_health" data-v="yes" onclick="setYN(this)">YES</button><button class="ynb" data-f="good_health" data-v="no" onclick="setYN(this)">NO</button></div></div></div>
+          <div class="fd"><label class="lbl">Date of Last Physical</label><input type="date" class="inp" id="f_last_phys"></div>
+          <div class="fd"><label class="lbl">Current Pharmacy</label><input class="inp" id="f_pharmacy"></div>
+          <div class="fd full"><div class="ynr"><span class="ynl">Have you ever had any serious illnesses, operations or hospitalizations?</span><div class="ynt"><button class="ynb" data-f="serious_ill" data-v="yes" onclick="setYN(this)">YES</button><button class="ynb" data-f="serious_ill" data-v="no" onclick="setYN(this)">NO</button></div></div></div>
+          <div class="fd c2 hidden" id="g_serious_desc"><label class="lbl">If so, describe:</label><textarea class="inp" id="f_serious_desc" placeholder="Describe illnesses, surgeries, or hospitalizations"></textarea></div>
+        </div>
+
+        <div class="stt">Do You Have or Have You Ever Had</div>
+        <p style="font-size:.77rem;color:var(--lt);margin-bottom:10px">(please indicate Yes or No for each)</p>
+        <div class="cgrid" id="condGrid"></div>
+
+        <div class="stt">Are You Using Any of the Following?</div>
+        <div class="cgrid" id="medGrid"></div>
+
+        <div class="fg" style="margin-top:13px">
+          <div class="fd full"><label class="lbl">Please list ALL current medications (prescription, OTC, herbal, vitamins, minerals)</label><textarea class="inp" id="f_meds" placeholder="List medications, dosages, and frequencies…" style="min-height:78px"></textarea></div>
+        </div>
+
+        <div class="stt">Are You Allergic To or Have You Had an Adverse Reaction To</div>
+        <div class="cgrid" id="allergyGrid"></div>
+        <div class="fg" style="margin-top:12px">
+          <div class="fd"><label class="lbl">Antibiotic allergies (list if applicable)</label><input class="inp" id="f_abx_list" placeholder="List specific antibiotics"></div>
+          <div class="fd"><label class="lbl">Other allergies or reactions</label><input class="inp" id="f_other_allergy" placeholder="List other allergies"></div>
+        </div>
+
+        <div class="stt">Additional Questions</div>
+        <div class="cgrid" id="lifestyleGrid"></div>
+        <div class="fd hidden" id="g_tobacco_amt" style="margin-top:10px"><label class="lbl">If tobacco, how much per day?</label><input class="inp" id="f_tobacco_amt"></div>
+
+        <div class="stt" style="color:var(--acc)">For Women Only</div>
+        <div class="pol" style="font-size:.77rem;margin-bottom:12px">If you are using Oral Contraceptives, it is important that you understand that antibiotics (and some other medications) may interfere with the effectiveness of oral contraceptives. Therefore, you will need to use mechanical forms of birth control for one complete cycle of birth control pills, after the course of antibiotics or other medication is completed. Please consult with your physician for further guidance.</div>
+        <div class="cgrid" id="womenGrid"></div>
+
+        <div style="margin-top:18px;padding:13px;background:var(--surf);border-radius:var(--r);font-size:.8rem;line-height:1.6;color:var(--txt);font-style:italic">I understand the importance of a truthful Health History to assist the doctor in providing the best care possible. I have had the opportunity to discuss my Health History with my doctor.</div>
+
+        <div class="ssec">
+          <h4>Signature of Person Completing Health History</h4>
+          <div class="swrap"><canvas id="sigHH" class="scan"></canvas><div class="sph" id="phHH">Sign here</div></div>
+          <div class="sctl"><button class="clrs" onclick="clrSig('sigHH')">Clear</button></div>
+          <div class="sdrow"><div class="fd"><label class="lbl">Date</label><input type="date" class="inp" id="f_hh_dt"></div></div>
+        </div>
+
+        <div id="err3" class="alert ae hidden"></div>
+        <div class="snav">
+          <button class="btn bS" onclick="goStep(2)">← Back</button>
+          <button class="btn bP ml" onclick="saveStep(3)">Save &amp; Continue →</button>
+        </div>
+      </div>
+    </div><!-- /s3 -->
+
+    <!-- STEP 4 -->
+    <div id="s4" class="hidden">
+      <div class="card">
+        <div class="chdl"><h2>HIPAA Privacy Notice</h2><p>Please read the following notice carefully and sign below to acknowledge receipt.</p></div>
+
+        <div class="pol" style="max-height:380px;font-size:.78rem">
+          <strong>Privacy Promise</strong><br>Davis Center for Oral and Maxillofacial Surgery understands that your medical and health information is personal. Protecting your health information is important. We follow strict federal and state laws that require us to maintain the confidentiality of your health information.<br><br>
+          <strong>How We Use Your Health Information</strong><br>When you receive care from Davis Center for Oral and Maxillofacial Surgery, we may use your health information for treatment, billing for services, and conducting our normal business.<br><br>
+          <strong>Treatment</strong> — We keep records of the care and services provided to you. Health care providers use these records to deliver quality care to meet your needs. Your doctor may share your health information with a specialist who will assist in your treatment.<br><br>
+          <strong>Payment</strong> — We maintain billing records that include payment information and documentation of services provided to you. We may also contact your insurance company to verify coverage for your care or to notify them of upcoming services that may require prior notice or approval.<br><br>
+          <strong>Health Care Operations</strong> — We use health information to improve the quality of care, train staff and students, provide customer service, manage costs, conduct required business duties, and make plans to better serve our community.<br><br>
+          <strong>We may also use your health information to:</strong><br>
+          — Recommend treatment alternatives<br>
+          — Tell you about health services and products that may benefit you<br>
+          — Share information with family or friends involved in your care, when appropriate<br>
+          — Share information with third parties who assist us with treatment, payment, and health care operations<br><br>
+          <strong>Situations where we may disclose health information without your signed authorization:</strong> public health purposes, health oversight activities (investigations, audits, inspections), lawsuits, when required by law, when requested by law enforcement, to coroners/medical examiners/funeral directors, for workers' compensation, organ and tissue donation, research under strict federal guidelines, and to protect victims of abuse, neglect, or domestic violence.<br><br>
+          <strong>Your Rights:</strong> You have the right to request restrictions on how we use and share your health information; request that we communicate with you in a specific way; inspect and copy your health information including medical billing records; request corrections to your health information; receive an accounting of certain disclosures; and request a paper copy of this notice.<br><br>
+          <strong>Contact Us:</strong><br>
+          Davis Center for Oral and Maxillofacial Surgery<br>
+          Kerri Jewkes, Privacy Officer<br>
+          890 W. Heritage Park Blvd. Suite 103 · Layton, UT 84041 · (801) 614-0999
+        </div>
+
+        <div class="chk" style="margin-top:14px"><input type="checkbox" id="f_hipaa_ack"><label for="f_hipaa_ack"><strong>I acknowledge</strong> that I have received and read the Privacy Practices Notice of Davis Center for Oral and Maxillofacial Surgery.</label></div>
+
+        <div class="ssec">
+          <h4>HIPAA Acknowledgment Signature</h4>
+          <div class="swrap"><canvas id="sigHIPAA" class="scan"></canvas><div class="sph" id="phHIPAA">Sign here</div></div>
+          <div class="sctl"><button class="clrs" onclick="clrSig('sigHIPAA')">Clear</button></div>
+          <div class="sdrow"><div class="fd"><label class="lbl">Date</label><input type="date" class="inp" id="f_hipaa_dt"></div></div>
+        </div>
+
+        <div id="err4" class="alert ae hidden"></div>
+        <div class="snav">
+          <button class="btn bS" onclick="goStep(3)">← Back</button>
+          <button class="btn bG ml" style="max-width:none" onclick="saveStep(4)">✓ Submit All Forms</button>
+        </div>
+      </div>
+    </div><!-- /s4 -->
+
+  </div><!-- /cw -->
+  <div class="pgft">Davis Center for Oral and Maxillofacial Surgery · 890 W Heritage Park Blvd, Suite 103 · Layton, Utah 84041<br>(801) 614-0999 · <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a></div>
+</div><!-- /vIntake -->
+
+<!-- ===== COMPLETE ===== -->
+<div id="vComplete" class="view">
+  <div class="phdr"><div class="logo">Davis Center for Oral and Maxillofacial Surgery</div><div class="sub">Paul Benson, DMD, MD</div></div>
+  <div class="cw" style="display:flex;align-items:center;flex:1;max-width:580px">
+    <div class="card comp" style="width:100%">
+      <div class="cico">✓</div>
+      <h2>Thank You!</h2>
+      <p>Your intake forms have been submitted successfully. Our team will review your information before your appointment.</p>
+      <p>A confirmation has been sent to <strong id="confEmail"></strong></p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:14px">
+        <button class="btn bS" onclick="showV('vLand')">Return Home</button>
+        <button class="btn bP" onclick="viewMyForms()">View My Forms</button>
+      </div>
+    </div>
+  </div>
+  <div class="pgft">Davis Center for Oral and Maxillofacial Surgery · 890 W Heritage Park Blvd, Suite 103 · Layton, Utah 84041<br>(801) 614-0999 · <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a></div>
+</div>
+
+<!-- ===== PATIENT FORMS VIEW ===== -->
+<div id="vMyForms" class="view">
+  <div class="phdr">
+    <button class="backBtn" onclick="showV('vLand')">← Home</button>
+    <div class="logo">My Forms</div>
+    <div class="sub">Davis Center for Oral and Maxillofacial Surgery</div>
+  </div>
+  <div class="cw">
+    <div class="card">
+      <div class="chdl"><h2>Your Forms</h2><p id="myFormsEmail" style="color:var(--pri);font-weight:700"></p></div>
+      <div class="flist" id="myFormsList"></div>
+      <div style="margin-top:18px;display:flex;gap:9px;flex-wrap:wrap">
+        <button class="btn bP hidden" id="btnContinue" onclick="continueIntake()">Continue Intake →</button>
+        <button class="btn bA hidden" id="btnEdit" onclick="editForms()">Edit Forms</button>
+        <button class="btn bS hidden" id="btnPrint" onclick="printForms()">🖨 Print / PDF</button>
+      </div>
+    </div>
+  </div>
+  <div class="pgft">Davis Center for Oral and Maxillofacial Surgery · 890 W Heritage Park Blvd, Suite 103 · Layton, Utah 84041<br>(801) 614-0999 · <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a></div>
+</div>
+
+<!-- ===== ADMIN LOGIN ===== -->
+<div id="vAdminLogin" class="view">
+  <div class="phdr">
+    <button class="backBtn" onclick="showV('vLand')">← Back</button>
+    <div class="logo">Admin Access</div>
+    <div class="sub">Davis Center for Oral and Maxillofacial Surgery</div>
+  </div>
+  <div class="cw" style="display:flex;align-items:center;flex:1;max-width:480px">
+    <div class="card" style="width:100%">
+      <div class="chdl"><h2>Admin Login</h2><p>This area is restricted to authorized staff only.</p></div>
+      <div class="fd" style="margin-bottom:11px"><label class="lbl">Email</label><input type="email" class="inp" id="aEmail" placeholder="admin@davisoms.com" onkeypress="if(event.key==='Enter')document.getElementById('aPwd').focus()"></div>
+      <div class="fd" style="margin-bottom:14px"><label class="lbl">Password</label><input type="password" class="inp" id="aPwd" placeholder="Password" onkeypress="if(event.key==='Enter')doAdminLogin()"></div>
+      <div id="adminErr" class="alert ae hidden"></div>
+      <button class="btn bP" style="width:100%" onclick="doAdminLogin()">Login →</button>
+    </div>
+  </div>
+  <div class="pgft">Davis Center for Oral and Maxillofacial Surgery · 890 W Heritage Park Blvd, Suite 103 · Layton, Utah 84041<br>(801) 614-0999 · <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a></div>
+</div>
+
+<!-- ===== ADMIN DASHBOARD ===== -->
+<div id="vAdminDash" class="view">
+  <div class="ahdr">
+    <div><h2>Patient Dashboard</h2><div style="font-size:.75rem;opacity:.65;margin-top:2px">Davis Center for Oral and Maxillofacial Surgery</div></div>
+    <div style="display:flex;gap:9px;align-items:center">
+      <span style="font-size:.78rem;opacity:.65" id="ptCount"></span>
+      <button class="btn bS" style="padding:7px 13px;font-size:.8rem" onclick="adminLogout()">Logout</button>
+    </div>
+  </div>
+  <div style="padding:18px 16px;flex:1;overflow:auto">
+    <div class="tblwrap">
+      <table class="ptbl" id="ptblEl">
+        <thead><tr>
+          <th>Patient Name</th><th>Email</th>
+          <th>Forms Completed</th><th>Date Completed</th>
+          <th>Last Activity</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="ptblBody"></tbody>
+      </table>
+    </div>
+    <div id="noPatients" class="alert ai hidden" style="margin-top:18px">No patient records found yet.</div>
+  </div>
+  <div class="pgft">Davis Center for Oral and Maxillofacial Surgery · 890 W Heritage Park Blvd, Suite 103 · Layton, Utah 84041<br>(801) 614-0999 · <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a></div>
+</div>
+
+<!-- ===== ADMIN PATIENT VIEW ===== -->
+<div id="vAdminPt" class="view">
+  <div class="ahdr">
+    <div><h2 id="aptName">Patient Forms</h2><div style="font-size:.75rem;opacity:.65;margin-top:2px" id="aptEmail"></div></div>
+    <div style="display:flex;gap:9px">
+      <button class="btn bA" style="padding:7px 13px;font-size:.8rem" onclick="printCurrentPt()">🖨 Print</button>
+      <button class="btn bS" style="padding:7px 13px;font-size:.8rem" onclick="showV('vAdminDash');loadDash()">← Back</button>
+    </div>
+  </div>
+  <div id="aptDetail" style="padding:18px 16px;flex:1;overflow:auto;max-width:900px;margin:0 auto;width:100%"></div>
+  <div class="pgft">Davis Center for Oral and Maxillofacial Surgery · 890 W Heritage Park Blvd, Suite 103 · Layton, Utah 84041<br>(801) 614-0999 · <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a></div>
+</div>
+
+<script>
+// ─── CONFIG ──────────────────────────────────────────────────────────
+// EmailJS: sign up at emailjs.com, create a service + template, paste IDs here
+// Template variables used: to_email, patient_name, patient_email, summary, submitted_at
+const EMAILJS_KEY = 'YOUR_EMAILJS_PUBLIC_KEY';
+const EMAILJS_SVC  = 'YOUR_SERVICE_ID';
+const EMAILJS_TPL  = 'YOUR_TEMPLATE_ID';
+const ADMIN_EMAIL  = 'info.davisoms@gmail.com';
+const ADMIN_CREDS  = { email:'info.davisoms@gmail.com', password:'D@vis890!' };
+
+// ─── STATE ───────────────────────────────────────────────────────────
+let mode = 'intake';      // 'intake' | 'view'
+let curEmail = '';
+let curStep  = 1;
+let ynMap    = {};        // field → 'yes'|'no'
+let sigPads  = {};        // canvasId → {canvas, ctx}
+let adminPtEmail = '';
+
+// ─── CONDITIONS DATA ─────────────────────────────────────────────────
+const CONDITIONS = [
+  ['cond_heart','Congenital Heart Disease, Rheumatic Fever, Heart Attack, Heart Trouble, Murmur, Coronary Artery Disease, Angina, High BP, Stroke, Palpitations, Heart Surgery, Pacemaker'],
+  ['cond_lung','Lung Disease — Asthma, Emphysema, Chronic Cough, Bronchitis, Pneumonia, TB, Shortness of Breath, Chest Pain, Severe Coughing'],
+  ['cond_seizures','Seizures, Convulsions, Epilepsy, Fainting or Dizziness'],
+  ['cond_jaw','Clicking/Popping of jaw joint, pain near ear, difficulty opening mouth, grinding or clenching teeth'],
+  ['cond_immune','Any disease, drug or transplant operation that has depressed your immune system?'],
+  ['cond_implants','Implants placed anywhere in your body — Heart Valve, Pacemaker, Hip, Knee, or other?'],
+  ['cond_bleeding','Bleeding Disorder, Anemia, Bleeding Tendency, Blood Transfusion, Bruise easily'],
+  ['cond_liver','Liver Disease (Jaundice, Hepatitis)'],
+  ['cond_kidney','Kidney Disease'],
+  ['cond_diabetes','Diabetes'],
+  ['cond_radiation','Radiation (X-ray) treatment for Cancer'],
+  ['cond_thyroid','Thyroid Disease (Goiter)'],
+  ['cond_glaucoma','Glaucoma'],
+  ['cond_sinus','Sinus or Nasal Problems'],
+  ['cond_arthritis','Arthritis'],
+  ['cond_stomach','Stomach Ulcers or Colitis'],
+];
+const MEDS = [
+  ['med_antibiotics','Antibiotics'],
+  ['med_steroids','Steroids (Cortisone, etc.)'],
+  ['med_tranq','Tranquilizers'],
+  ['med_digitalis','Digitalis, Inderal, Nitroglycerin or other heart drug'],
+  ['med_insulin','Insulin or Oral Anti-Diabetic Drugs'],
+  ['med_hbp','High Blood Pressure Medications'],
+  ['med_anticoag','Anticoagulants (Blood Thinners)'],
+  ['med_aspirin','Aspirin or drugs such as Motrin, Aleve, Ibuprofen'],
+];
+const ALLERGIES = [
+  ['all_local','Local Anesthesia (Novocain, etc.)'],
+  ['all_aspirin','Aspirin or Ibuprofen'],
+  ['all_abx','Antibiotics (list below if yes)'],
+  ['all_codeine','Codeine or other pain killers'],
+  ['all_latex','Latex or Rubber Products'],
+  ['all_sedatives','Sedatives, Barbiturates'],
+];
+const LIFESTYLE = [
+  ['tobacco','Do you smoke or chew tobacco?'],
+  ['alcohol','History of Alcohol, Chemical Dependency or Emotional Disorder?'],
+  ['dental_probs','Serious problems with previous dental treatment?'],
+  ['anesthesia_probs','You or a family member had problems with intravenous anesthesia?'],
+  ['other_conds','Any other disease, condition or problem the doctor should know about?'],
+  ['talk_private','Do you wish to talk to the doctor privately about anything?'],
+  ['cannabis','Do you smoke or consume cannabis?'],
+];
+const WOMEN = [
+  ['pregnant','Are you pregnant, or is there any chance you might be pregnant?'],
+  ['nursing','Are you nursing?'],
+  ['oral_contra','Are you using Oral Contraceptives?'],
+];
+
+// ─── VIEW MANAGEMENT ─────────────────────────────────────────────────
+function showV(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function gotoEmail(m) {
+  mode = m;
+  const t = document.getElementById('emailTitle');
+  const s = document.getElementById('emailSub');
+  if (m === 'intake') {
+    t.textContent = 'Become a Patient';
+    s.textContent = 'Enter your email to begin or continue your intake forms.';
+  } else {
+    t.textContent = 'View Your Forms';
+    s.textContent = 'Enter your email to view your current form status.';
+  }
+  document.getElementById('inEmail').value = '';
+  showV('vEmail');
+  setTimeout(() => document.getElementById('inEmail').focus(), 200);
+}
+
+// ─── EMAIL ENTRY ─────────────────────────────────────────────────────
+function doEmail() {
+  const em = document.getElementById('inEmail').value.trim().toLowerCase();
+  if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
+    showErr('emailErr','Please enter a valid email address.'); return;
+  }
+  hideErr('emailErr');
+  curEmail = em;
+  const pt = getPatient(em);
+
+  if (mode === 'view') {
+    if (!pt) { showErr('emailErr','No records found for this email address.'); return; }
+    loadMyForms(pt); showV('vMyForms');
+  } else {
+    if (!pt) initPatient(em);
+    const step = nextStep(pt);
+    launchIntake(step, pt || getPatient(em));
+  }
+}
+
+// ─── PATIENT DATA ─────────────────────────────────────────────────────
+function getPatient(email) {
+  return (JSON.parse(localStorage.getItem('oms_patients')||'[]')).find(p=>p.email===email)||null;
+}
+function getAllPatients() { return JSON.parse(localStorage.getItem('oms_patients')||'[]'); }
+function savePatient(pt) {
+  const all = getAllPatients();
+  const i = all.findIndex(p=>p.email===pt.email);
+  if (i>=0) all[i]=pt; else all.push(pt);
+  localStorage.setItem('oms_patients', JSON.stringify(all));
+}
+function initPatient(email) {
+  savePatient({
+    id: Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+    email, name:'', createdAt:new Date().toISOString(),
+    lastActivity:new Date().toISOString(), completedAt:null, status:'in_progress',
+    forms:{ pi:{done:false,data:{}}, ins:{done:false,data:{}}, hh:{done:false,data:{}}, hipaa:{done:false,data:{}} },
+    sigs:{}, ynMap:{}
+  });
+}
+function nextStep(pt) {
+  if (!pt) return 1;
+  if (!pt.forms.pi.done)   return 1;
+  if (!pt.forms.ins.done)  return 2;
+  if (!pt.forms.hh.done)   return 3;
+  if (!pt.forms.hipaa.done)return 4;
+  return 1;
+}
+
+// ─── LAUNCH INTAKE ────────────────────────────────────────────────────
+function launchIntake(step, pt) {
+  curStep = step;
+  ynMap = (pt && pt.ynMap) ? {...pt.ynMap} : {};
+  buildDynamicGrids();
+  updateProg(step);
+  showSteps(step);
+  showV('vIntake');
+  setTimeout(()=>{ initSigs(); setTodayDates(); if(pt) prefill(pt); }, 100);
+}
+
+function showSteps(active) {
+  [1,2,3,4].forEach(i => {
+    document.getElementById('s'+i).classList.toggle('hidden', i!==active);
+  });
+}
+
+function goStep(n) {
+  curStep = n;
+  updateProg(n);
+  showSteps(n);
+  if (n===3) {
+    const pt = getPatient(curEmail);
+    if (pt && pt.forms.pi.done) {
+      document.getElementById('f_hh_name').value = pt.forms.pi.data.name||'';
+      document.getElementById('f_hh_dob').value  = pt.forms.pi.data.dob||'';
+    }
+  }
+  window.scrollTo(0,0);
+}
+
+function updateProg(active) {
+  [1,2,3,4].forEach(i=>{
+    const b = document.getElementById('pb'+i);
+    const l = document.getElementById('pl'+i);
+    const c = document.getElementById('pc'+i);
+    b.classList.remove('act','don');
+    l.classList.remove('act','don');
+    if (i < active)  { b.classList.add('don'); b.textContent='✓'; l.classList.add('don'); }
+    else if (i===active){ b.classList.add('act'); b.textContent=i; l.classList.add('act'); }
+    else { b.textContent=i; }
+    if (c) c.classList.toggle('don', i<active);
+  });
+}
+
+// ─── DYNAMIC GRIDS ────────────────────────────────────────────────────
+function buildDynamicGrids() {
+  buildGrid('condGrid',    CONDITIONS);
+  buildGrid('medGrid',     MEDS);
+  buildGrid('allergyGrid', ALLERGIES);
+  buildGrid('lifestyleGrid', LIFESTYLE);
+  buildGrid('womenGrid',   WOMEN);
+}
+function buildGrid(id, items) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = items.map(([f,lbl])=>`
+    <div class="ci">
+      <span style="flex:1">${lbl}</span>
+      <div class="ynt">
+        <button class="ynb" data-f="${f}" data-v="yes" onclick="setYN(this)">Y</button>
+        <button class="ynb" data-f="${f}" data-v="no"  onclick="setYN(this)">N</button>
+      </div>
+    </div>`).join('');
+}
+
+// ─── Y/N TOGGLES ─────────────────────────────────────────────────────
+function setYN(btn) {
+  const f = btn.dataset.f, v = btn.dataset.v;
+  ynMap[f] = v;
+  btn.closest('.ynt').querySelectorAll('.ynb').forEach(b=>{
+    b.classList.remove('sy','sn');
+  });
+  btn.classList.add(v==='yes'?'sy':'sn');
+  handleCond(f,v);
+}
+function restoreYN(f,v) {
+  ynMap[f] = v;
+  document.querySelectorAll(`[data-f="${f}"]`).forEach(b=>{
+    b.classList.remove('sy','sn');
+    if (b.dataset.v===v) b.classList.add(v==='yes'?'sy':'sn');
+  });
+  handleCond(f,v);
+}
+function handleCond(f,v) {
+  const show = v==='yes';
+  const map = {
+    treated_before: ['g_treated_who'],
+    share_family:   ['g_share_who'],
+    physician_care: ['g_phys_name','g_phys_phone'],
+    serious_ill:    ['g_serious_desc'],
+    tobacco:        ['g_tobacco_amt'],
+  };
+  (map[f]||[]).forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.toggle('hidden',!show);
+  });
+}
+
+// ─── SIGNATURES ───────────────────────────────────────────────────────
+const SIG_IDS = ['sigFin','sigPriv','sigIns','sigHH','sigHIPAA'];
+function initSigs() {
+  SIG_IDS.forEach(id=>{
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    canvas.width  = canvas.parentElement.clientWidth || 600;
+    canvas.height = 110;
+    const ctx = canvas.getContext('2d');
+    ctx.strokeStyle='#1F3A5F'; ctx.lineWidth=2; ctx.lineCap='round'; ctx.lineJoin='round';
+    let drawing=false;
+    function pos(e){
+      const r=canvas.getBoundingClientRect(), sx=canvas.width/r.width, sy=canvas.height/r.height;
+      if(e.touches) return {x:(e.touches[0].clientX-r.left)*sx, y:(e.touches[0].clientY-r.top)*sy};
+      return {x:(e.clientX-r.left)*sx, y:(e.clientY-r.top)*sy};
+    }
+    function start(e){
+      e.preventDefault(); drawing=true;
+      const p=pos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y);
+      const ph=document.getElementById('ph'+id.replace('sig',''));
+      if(ph) ph.style.display='none';
+    }
+    function move(e){
+      if(!drawing)return; e.preventDefault();
+      const p=pos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(p.x,p.y);
+    }
+    function end(){ drawing=false; ctx.beginPath(); }
+    canvas.addEventListener('mousedown',start);
+    canvas.addEventListener('mousemove',move);
+    canvas.addEventListener('mouseup',end);
+    canvas.addEventListener('mouseleave',end);
+    canvas.addEventListener('touchstart',start,{passive:false});
+    canvas.addEventListener('touchmove',move,{passive:false});
+    canvas.addEventListener('touchend',end);
+    sigPads[id]={canvas,ctx};
+  });
+}
+function clrSig(id) {
+  const p=sigPads[id]; if(!p)return;
+  p.ctx.clearRect(0,0,p.canvas.width,p.canvas.height);
+  const key=id.replace('sig','');
+  const ph=document.getElementById('ph'+key);
+  if(ph) ph.style.display='';
+}
+function getSig(id) {
+  const c=document.getElementById(id); return c ? c.toDataURL() : null;
+}
+function drawSig(id, dataUrl) {
+  const c=document.getElementById(id); if(!c||!dataUrl)return;
+  const img=new Image();
+  img.onload=()=>{
+    if(sigPads[id]) sigPads[id].ctx.drawImage(img,0,0);
+    const ph=document.getElementById('ph'+id.replace('sig',''));
+    if(ph) ph.style.display='none';
+  };
+  img.src=dataUrl;
+}
+function setTodayDates() {
+  const t=new Date().toISOString().split('T')[0];
+  ['f_fin_dt','f_priv_dt','f_ins_dt','f_hh_dt','f_hipaa_dt'].forEach(id=>{
+    const el=document.getElementById(id); if(el&&!el.value) el.value=t;
+  });
+}
+
+// ─── SAVE STEPS ───────────────────────────────────────────────────────
+function saveStep(n) {
+  const pt = getPatient(curEmail) || (initPatient(curEmail), getPatient(curEmail));
+
+  if (n===1) {
+    const name = v('f_name'), dob = v('f_dob'), cell = v('f_cell'), email = v('f_email');
+    if (!name){ showErr('err1','Patient name is required.'); return; }
+    if (!dob) { showErr('err1','Date of birth is required.'); return; }
+    if (!cell){ showErr('err1','Cell phone is required.'); return; }
+    if (!email){ showErr('err1','Email address is required.'); return; }
+    hideErr('err1');
+    pt.name = name;
+    pt.forms.pi = { done:true, data:collectS1() };
+    pt.sigs.fin  = getSig('sigFin');
+    pt.sigs.priv = getSig('sigPriv');
+
+  } else if (n===2) {
+    hideErr('err2');
+    pt.forms.ins = { done:true, data:collectS2() };
+    pt.sigs.ins  = getSig('sigIns');
+
+  } else if (n===3) {
+    hideErr('err3');
+    pt.forms.hh  = { done:true, data:collectS3() };
+    pt.sigs.hh   = getSig('sigHH');
+
+  } else if (n===4) {
+    if (!document.getElementById('f_hipaa_ack').checked) {
+      showErr('err4','Please acknowledge that you have read the HIPAA Privacy Notice.'); return;
+    }
+    hideErr('err4');
+    pt.forms.hipaa = { done:true, data:{acknowledged:true, date:v('f_hipaa_dt')} };
+    pt.sigs.hipaa  = getSig('sigHIPAA');
+    pt.status      = 'completed';
+    pt.completedAt = new Date().toISOString();
+  }
+
+  pt.ynMap       = {...ynMap};
+  pt.lastActivity= new Date().toISOString();
+  savePatient(pt);
+
+  if (n < 4) {
+    goStep(n+1);
+  } else {
+    sendEmail(pt);
+    document.getElementById('confEmail').textContent = curEmail;
+    showV('vComplete');
+  }
+}
+
+// ─── COLLECT DATA ─────────────────────────────────────────────────────
+const v  = id => (document.getElementById(id)||{}).value?.trim()||'';
+const cb = id => (document.getElementById(id)||{}).checked||false;
+
+function collectS1() {
+  return {
+    treated_before:ynMap.treated_before||'', treated_who:v('f_treated_who'),
+    referred_by:v('f_referred_by'), dentist:v('f_dentist'), orthodontist:v('f_orthodontist'),
+    name:v('f_name'), ssn:v('f_ssn'), dob:v('f_dob'), age:v('f_age'), sex:v('f_sex'), marital:v('f_marital'),
+    cell:v('f_cell'), alt_phone:v('f_alt_phone'), voicemail:ynMap.voicemail||'',
+    email:v('f_email'), email_info:ynMap.email_info||'',
+    addr:v('f_addr'), city:v('f_city'), state:v('f_state'), zip:v('f_zip'),
+    employer:v('f_employer'), work_phone:v('f_work_phone'), occ:v('f_occ'),
+    work_contact:ynMap.work_contact||'', work_addr:v('f_work_addr'),
+    work_city:v('f_work_city'), work_state:v('f_work_state'), work_zip:v('f_work_zip'),
+    share_family:ynMap.share_family||'', share_who:v('f_share_who'),
+    ec_name:v('f_ec_name'), ec_rel:v('f_ec_rel'), ec_phone:v('f_ec_phone'),
+    rp_name:v('f_rp_name'), rp_ssn:v('f_rp_ssn'), rp_dob:v('f_rp_dob'), rp_age:v('f_rp_age'),
+    rp_sex:v('f_rp_sex'), rp_marital:v('f_rp_marital'), rp_cell:v('f_rp_cell'), rp_alt:v('f_rp_alt'),
+    rp_addr:v('f_rp_addr'), rp_city:v('f_rp_city'), rp_state:v('f_rp_state'), rp_zip:v('f_rp_zip'),
+    rp_employer:v('f_rp_employer'), rp_wphone:v('f_rp_wphone'), rp_occ:v('f_rp_occ'),
+    rp_waddr:v('f_rp_waddr'), rp_wcity:v('f_rp_wcity'), rp_wstate:v('f_rp_wstate'), rp_wzip:v('f_rp_wzip'),
+    fin_dt:v('f_fin_dt'), priv_dt:v('f_priv_dt')
+  };
+}
+function collectS2() {
+  return {
+    pd_holder:v('f_pd_holder'), pd_ssn:v('f_pd_ssn'), pd_dob:v('f_pd_dob'), pd_emp:v('f_pd_emp'),
+    pd_co:v('f_pd_co'), pd_addr:v('f_pd_addr'), pd_pol:v('f_pd_pol'), pd_grp:v('f_pd_grp'),
+    sd_holder:v('f_sd_holder'), sd_ssn:v('f_sd_ssn'), sd_dob:v('f_sd_dob'), sd_emp:v('f_sd_emp'),
+    sd_co:v('f_sd_co'), sd_addr:v('f_sd_addr'), sd_pol:v('f_sd_pol'), sd_grp:v('f_sd_grp'),
+    pm_holder:v('f_pm_holder'), pm_ssn:v('f_pm_ssn'), pm_dob:v('f_pm_dob'), pm_emp:v('f_pm_emp'),
+    pm_co:v('f_pm_co'), pm_addr:v('f_pm_addr'), pm_pol:v('f_pm_pol'), pm_grp:v('f_pm_grp'),
+    sm_holder:v('f_sm_holder'), sm_ssn:v('f_sm_ssn'), sm_dob:v('f_sm_dob'), sm_emp:v('f_sm_emp'),
+    sm_co:v('f_sm_co'), sm_addr:v('f_sm_addr'), sm_pol:v('f_sm_pol'), sm_grp:v('f_sm_grp'),
+    no_ins:cb('f_no_ins'), ins_dt:v('f_ins_dt')
+  };
+}
+function collectS3() {
+  const yn = f => ynMap[f]||'';
+  return {
+    height:v('f_hh_ht'), weight:v('f_hh_wt'),
+    physician_care:yn('physician_care'), phys_name:v('f_phys_name'), phys_phone:v('f_phys_phone'),
+    good_health:yn('good_health'), last_phys:v('f_last_phys'), pharmacy:v('f_pharmacy'),
+    serious_ill:yn('serious_ill'), serious_desc:v('f_serious_desc'),
+    ...Object.fromEntries(CONDITIONS.map(([f])=>[f,yn(f)])),
+    ...Object.fromEntries(MEDS.map(([f])=>[f,yn(f)])),
+    meds:v('f_meds'),
+    ...Object.fromEntries(ALLERGIES.map(([f])=>[f,yn(f)])),
+    abx_list:v('f_abx_list'), other_allergy:v('f_other_allergy'),
+    ...Object.fromEntries(LIFESTYLE.map(([f])=>[f,yn(f)])),
+    tobacco_amt:v('f_tobacco_amt'),
+    ...Object.fromEntries(WOMEN.map(([f])=>[f,yn(f)])),
+    hh_dt:v('f_hh_dt')
+  };
+}
+
+// ─── PREFILL ──────────────────────────────────────────────────────────
+function prefill(pt) {
+  if (pt.forms.pi.done) {
+    const d = pt.forms.pi.data;
+    const map = {name:'f_name',ssn:'f_ssn',dob:'f_dob',age:'f_age',sex:'f_sex',marital:'f_marital',
+      cell:'f_cell',alt_phone:'f_alt_phone',email:'f_email',addr:'f_addr',city:'f_city',
+      state:'f_state',zip:'f_zip',employer:'f_employer',work_phone:'f_work_phone',occ:'f_occ',
+      work_addr:'f_work_addr',work_city:'f_work_city',work_state:'f_work_state',work_zip:'f_work_zip',
+      share_who:'f_share_who',treated_who:'f_treated_who',referred_by:'f_referred_by',
+      dentist:'f_dentist',orthodontist:'f_orthodontist',ec_name:'f_ec_name',ec_rel:'f_ec_rel',
+      ec_phone:'f_ec_phone',rp_name:'f_rp_name',rp_ssn:'f_rp_ssn',rp_dob:'f_rp_dob',
+      rp_age:'f_rp_age',rp_sex:'f_rp_sex',rp_marital:'f_rp_marital',rp_cell:'f_rp_cell',
+      rp_alt:'f_rp_alt',rp_addr:'f_rp_addr',rp_city:'f_rp_city',rp_state:'f_rp_state',
+      rp_zip:'f_rp_zip',rp_employer:'f_rp_employer',rp_wphone:'f_rp_wphone',rp_occ:'f_rp_occ',
+      rp_waddr:'f_rp_waddr',rp_wcity:'f_rp_wcity',rp_wstate:'f_rp_wstate',rp_wzip:'f_rp_wzip',
+      fin_dt:'f_fin_dt',priv_dt:'f_priv_dt'};
+    Object.entries(map).forEach(([k,id])=>{ const el=document.getElementById(id); if(el&&d[k])el.value=d[k]; });
+    if(pt.sigs.fin)  setTimeout(()=>drawSig('sigFin', pt.sigs.fin),150);
+    if(pt.sigs.priv) setTimeout(()=>drawSig('sigPriv',pt.sigs.priv),150);
+  }
+  if (pt.forms.ins.done) {
+    const d=pt.forms.ins.data;
+    ['pd_holder','pd_ssn','pd_dob','pd_emp','pd_co','pd_addr','pd_pol','pd_grp',
+     'sd_holder','sd_ssn','sd_dob','sd_emp','sd_co','sd_addr','sd_pol','sd_grp',
+     'pm_holder','pm_ssn','pm_dob','pm_emp','pm_co','pm_addr','pm_pol','pm_grp',
+     'sm_holder','sm_ssn','sm_dob','sm_emp','sm_co','sm_addr','sm_pol','sm_grp','ins_dt']
+    .forEach(k=>{ const el=document.getElementById('f_'+k); if(el&&d[k])el.value=d[k]; });
+    const ni=document.getElementById('f_no_ins'); if(ni) ni.checked=d.no_ins||false;
+    if(pt.sigs.ins) setTimeout(()=>drawSig('sigIns',pt.sigs.ins),150);
+  }
+  if (pt.forms.hh.done) {
+    const d=pt.forms.hh.data;
+    ['height:f_hh_ht','weight:f_hh_wt','phys_name:f_phys_name','phys_phone:f_phys_phone',
+     'last_phys:f_last_phys','pharmacy:f_pharmacy','serious_desc:f_serious_desc',
+     'meds:f_meds','abx_list:f_abx_list','other_allergy:f_other_allergy','tobacco_amt:f_tobacco_amt','hh_dt:f_hh_dt']
+    .forEach(s=>{ const [k,id]=s.split(':'); const el=document.getElementById(id); if(el&&d[k])el.value=d[k]; });
+    if(pt.sigs.hh) setTimeout(()=>drawSig('sigHH',pt.sigs.hh),150);
+  }
+  if (pt.forms.hipaa.done) {
+    const a=document.getElementById('f_hipaa_ack'); if(a) a.checked=true;
+    if(pt.sigs.hipaa) setTimeout(()=>drawSig('sigHIPAA',pt.sigs.hipaa),150);
+    const dt=document.getElementById('f_hipaa_dt');
+    if(dt&&pt.forms.hipaa.data.date) dt.value=pt.forms.hipaa.data.date;
+  }
+  // Restore all Y/N
+  if (pt.ynMap) Object.entries(pt.ynMap).forEach(([f,val])=>restoreYN(f,val));
+  // Prefill health history name/dob from patient info
+  const pi=pt.forms.pi.data;
+  const hn=document.getElementById('f_hh_name'); if(hn&&pi.name) hn.value=pi.name;
+  const hd=document.getElementById('f_hh_dob');  if(hd&&pi.dob)  hd.value=pi.dob;
+}
+
+// ─── PATIENT FORMS VIEW ───────────────────────────────────────────────
+function loadMyForms(pt) {
+  document.getElementById('myFormsEmail').textContent = pt.email;
+  const list = document.getElementById('myFormsList');
+  const FORMS = [
+    {key:'pi',   label:'Patient Information',  desc:'Personal & contact details, emergency contact, financial agreement'},
+    {key:'ins',  label:'Insurance Information', desc:'Primary & secondary dental and medical insurance'},
+    {key:'hh',   label:'Health History',        desc:'Medical conditions, medications, and allergies'},
+    {key:'hipaa',label:'HIPAA Privacy Notice',  desc:'Privacy practices acknowledgment'},
+  ];
+  list.innerHTML = FORMS.map(f=>{
+    const done = pt.forms[f.key]?.done;
+    return `<div class="fi ${done?'done':'pend'}">
+      <div class="fi"><div style="flex:1"><h4>${done?'✓ ':' ○ '}${f.label}</h4><p>${f.desc}</p></div>
+      <span style="font-size:.76rem;font-weight:700;color:${done?'var(--ok)':'var(--warn)'};">${done?'Completed':'Pending'}</span></div>
+    </div>`;
+  }).join('');
+  const allDone = ['pi','ins','hh','hipaa'].every(k=>pt.forms[k]?.done);
+  document.getElementById('btnContinue').classList.toggle('hidden', allDone);
+  document.getElementById('btnEdit').classList.toggle('hidden', !allDone);
+  document.getElementById('btnPrint').classList.toggle('hidden', !Object.values(pt.forms).some(f=>f.done));
+}
+function viewMyForms() {
+  const pt = getPatient(curEmail); if(!pt) return;
+  loadMyForms(pt); showV('vMyForms');
+}
+function continueIntake() {
+  const pt = getPatient(curEmail);
+  launchIntake(nextStep(pt), pt);
+}
+function editForms() {
+  const pt = getPatient(curEmail);
+  launchIntake(1, pt);
+}
+function printForms() {
+  const pt = getPatient(curEmail); if(!pt)return;
+  openPrintWindow(pt);
+}
+
+// ─── ADMIN ────────────────────────────────────────────────────────────
+function doAdminLogin() {
+  const em=document.getElementById('aEmail').value.trim();
+  const pw=document.getElementById('aPwd').value;
+  if (em===ADMIN_CREDS.email && pw===ADMIN_CREDS.password) {
+    sessionStorage.setItem('oms_admin','1');
+    hideErr('adminErr');
+    loadDash(); showV('vAdminDash');
+  } else { showErr('adminErr','Invalid email or password.'); }
+}
+function adminLogout() { sessionStorage.removeItem('oms_admin'); showV('vLand'); }
+function loadDash() {
+  const pts = getAllPatients();
+  const body = document.getElementById('ptblBody');
+  document.getElementById('ptCount').textContent = pts.length+' patient'+(pts.length!==1?'s':'');
+  document.getElementById('noPatients').classList.toggle('hidden', pts.length>0);
+  const LABELS = {pi:'Patient Info',ins:'Insurance',hh:'Health History',hipaa:'HIPAA'};
+  body.innerHTML = pts.sort((a,b)=>new Date(b.lastActivity)-new Date(a.lastActivity)).map(p=>{
+    const done = Object.entries(p.forms).filter(([,f])=>f.done).map(([k])=>LABELS[k]||k);
+    return `<tr>
+      <td><strong>${p.name||'(No name)'}</strong></td>
+      <td style="font-size:.8rem;color:var(--lt)">${p.email}</td>
+      <td>${done.length?done.map(d=>`<span class="bdg bd">${d}</span> `).join(''):'<span class="bdg" style="background:#eee;color:#999">None</span>'}</td>
+      <td>${p.completedAt?new Date(p.completedAt).toLocaleDateString():'—'}</td>
+      <td>${p.lastActivity?new Date(p.lastActivity).toLocaleDateString():'—'}</td>
+      <td><button class="btn bP" style="padding:6px 13px;font-size:.77rem" onclick="adminViewPt('${p.email}')">View Forms</button></td>
+    </tr>`;
+  }).join('');
+}
+function adminViewPt(email) {
+  adminPtEmail = email;
+  const pt = getPatient(email); if(!pt)return;
+  document.getElementById('aptName').textContent  = pt.name||'(No name)';
+  document.getElementById('aptEmail').textContent = pt.email;
+  document.getElementById('aptDetail').innerHTML  = buildDetailHTML(pt);
+  showV('vAdminPt');
+}
+function printCurrentPt() {
+  const pt = getPatient(adminPtEmail); if(!pt)return;
+  openPrintWindow(pt);
+}
+
+// ─── PRINT WINDOW ─────────────────────────────────────────────────────
+function openPrintWindow(pt) {
+  const w = window.open('','_blank','width=900,height=700');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Patient Forms — ${pt.name}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:'Nunito',sans-serif;color:#2E2E2E;margin:0;padding:20px;font-size:11pt}
+    .card{background:#fff;border:1px solid #d4dde6;border-radius:8px;padding:20px;margin-bottom:16px;page-break-inside:avoid}
+    .stt{font-size:.7rem;font-weight:700;color:#1F3A5F;text-transform:uppercase;letter-spacing:.09em;border-bottom:2px solid #6FB3B8;padding-bottom:5px;margin:16px 0 10px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .field{padding:7px 0;border-bottom:1px solid #f0f4f8}
+    .lbl{font-size:.68rem;color:#6b7a8d;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+    .val{font-size:.86rem;margin-top:2px}
+    .full{grid-column:1/-1}
+    .yn-y{color:#2e8b57;font-weight:700} .yn-n{color:#c0392b;font-weight:700}
+    .sigimg{max-width:280px;height:70px;border:1px solid #d4dde6;border-radius:4px}
+    .hdr{text-align:center;padding:0 0 18px;border-bottom:2px solid #1F3A5F;margin-bottom:20px}
+    .hdr h1{font-family:'Libre Baskerville',serif;font-size:1.3rem;color:#1F3A5F}
+    .hdr p{font-size:.82rem;color:#6b7a8d;margin-top:3px}
+    @media print{@page{margin:1.5cm} button{display:none!important}}
+  </style></head><body>`);
+  w.document.write(`<div class="hdr">
+    <h1>Davis Center for Oral and Maxillofacial Surgery</h1>
+    <p>Paul Benson, DMD, MD · 890 W Heritage Park Blvd, Suite 103 · Layton, UT 84041 · (801) 614-0999</p>
+    <p style="font-weight:700;color:#2E2E2E;margin-top:10px">Patient: ${pt.name} &nbsp;|&nbsp; ${pt.email}${pt.completedAt?`<br><span style="font-size:.75rem;color:#6b7a8d">Submitted: ${new Date(pt.completedAt).toLocaleString()}</span>`:''}</p>
+  </div>`);
+  w.document.write(buildDetailHTML(pt, true));
+  w.document.write(`<br><div style="text-align:center"><button onclick="window.print()" style="padding:10px 24px;background:#3A7CA5;color:#fff;border:none;border-radius:6px;font-size:.95rem;cursor:pointer;font-family:Nunito,sans-serif;font-weight:700">🖨 Print / Save as PDF</button></div></body></html>`);
+  w.document.close();
+}
+
+// ─── BUILD DETAIL HTML ────────────────────────────────────────────────
+function buildDetailHTML(pt, print=false) {
+  const f = v => v||'<span style="color:#bbb">—</span>';
+  const yn = v => v==='yes'?'<span class="yn-y">YES</span>':v==='no'?'<span class="yn-n">NO</span>':'<span style="color:#bbb">—</span>';
+  const pi = pt.forms.pi.data||{};
+  const ins= pt.forms.ins.data||{};
+  const hh = pt.forms.hh.data||{};
+  let html='';
+
+  if (pt.forms.pi.done) {
+    html += `<div class="card">
+    <strong style="font-size:1rem;color:#1F3A5F">1. Patient Information</strong>
+    <div class="stt">Referral</div>
+    <div class="grid2">
+      <div class="field"><div class="lbl">Treated Here Before?</div><div class="val">${f(pi.treated_before)}</div></div>
+      <div class="field"><div class="lbl">Referred By</div><div class="val">${f(pi.referred_by)}</div></div>
+      <div class="field"><div class="lbl">Dentist</div><div class="val">${f(pi.dentist)}</div></div>
+      <div class="field"><div class="lbl">Orthodontist</div><div class="val">${f(pi.orthodontist)}</div></div>
+    </div>
+    <div class="stt">Personal Information</div>
+    <div class="grid2">
+      <div class="field full"><div class="lbl">Patient Name</div><div class="val"><strong>${f(pi.name)}</strong></div></div>
+      <div class="field"><div class="lbl">SSN</div><div class="val">${f(pi.ssn)}</div></div>
+      <div class="field"><div class="lbl">Date of Birth</div><div class="val">${f(pi.dob)}</div></div>
+      <div class="field"><div class="lbl">Age</div><div class="val">${f(pi.age)}</div></div>
+      <div class="field"><div class="lbl">Sex</div><div class="val">${f(pi.sex)}</div></div>
+      <div class="field"><div class="lbl">Marital Status</div><div class="val">${f(pi.marital)}</div></div>
+      <div class="field"><div class="lbl">Cell Phone</div><div class="val">${f(pi.cell)}</div></div>
+      <div class="field"><div class="lbl">Alternate Phone</div><div class="val">${f(pi.alt_phone)}</div></div>
+      <div class="field"><div class="lbl">Email</div><div class="val">${f(pi.email||pt.email)}</div></div>
+      <div class="field"><div class="lbl">May Email Info?</div><div class="val">${yn(pi.email_info)}</div></div>
+      <div class="field full"><div class="lbl">Home Address</div><div class="val">${[pi.addr,pi.city,pi.state,pi.zip].filter(Boolean).join(', ')||'—'}</div></div>
+      <div class="field"><div class="lbl">Employer / School</div><div class="val">${f(pi.employer)}</div></div>
+      <div class="field"><div class="lbl">Occupation</div><div class="val">${f(pi.occ)}</div></div>
+    </div>
+    <div class="stt">Emergency Contact</div>
+    <div class="grid2">
+      <div class="field"><div class="lbl">Name</div><div class="val">${f(pi.ec_name)}</div></div>
+      <div class="field"><div class="lbl">Relationship</div><div class="val">${f(pi.ec_rel)}</div></div>
+      <div class="field"><div class="lbl">Phone</div><div class="val">${f(pi.ec_phone)}</div></div>
+    </div>
+    ${pi.rp_name?`<div class="stt">Responsible Party</div><div class="grid2">
+      <div class="field"><div class="lbl">Name</div><div class="val">${f(pi.rp_name)}</div></div>
+      <div class="field"><div class="lbl">Cell Phone</div><div class="val">${f(pi.rp_cell)}</div></div>
+      <div class="field"><div class="lbl">Date of Birth</div><div class="val">${f(pi.rp_dob)}</div></div>
+      <div class="field"><div class="lbl">Employer</div><div class="val">${f(pi.rp_employer)}</div></div>
+    </div>`:''}
+    <div class="stt">Signatures</div>
+    <div style="display:flex;gap:22px;flex-wrap:wrap">
+      ${pt.sigs.fin?`<div><div class="lbl" style="margin-bottom:5px">Financial Agreement — ${f(pi.fin_dt)}</div><img class="sigimg" src="${pt.sigs.fin}" alt="Signature"></div>`:''}
+      ${pt.sigs.priv?`<div><div class="lbl" style="margin-bottom:5px">Privacy Practices — ${f(pi.priv_dt)}</div><img class="sigimg" src="${pt.sigs.priv}" alt="Signature"></div>`:''}
+    </div></div>`;
+  }
+
+  if (pt.forms.ins.done) {
+    const insBlock = (title,pre) => `<div class="stt">${title}</div><div class="grid2">
+      <div class="field"><div class="lbl">Policy Holder</div><div class="val">${f(ins[pre+'holder'])}</div></div>
+      <div class="field"><div class="lbl">Policy Holder DOB</div><div class="val">${f(ins[pre+'dob'])}</div></div>
+      <div class="field"><div class="lbl">Insurance Company</div><div class="val">${f(ins[pre+'co'])}</div></div>
+      <div class="field"><div class="lbl">Policy/Subscriber ID</div><div class="val">${f(ins[pre+'pol'])}</div></div>
+      <div class="field"><div class="lbl">Group #</div><div class="val">${f(ins[pre+'grp'])}</div></div>
+      <div class="field"><div class="lbl">Employer</div><div class="val">${f(ins[pre+'emp'])}</div></div>
+    </div>`;
+    html += `<div class="card">
+    <strong style="font-size:1rem;color:#1F3A5F">2. Insurance Information</strong>
+    ${ins.no_ins?'<div style="padding:10px;background:#fff3cd;border-radius:6px;margin-top:10px;font-size:.85rem">Patient indicated they do not have dental/medical insurance to submit.</div>':''}
+    ${insBlock('Primary Dental Insurance','pd_')}
+    ${insBlock('Secondary Dental Insurance','sd_')}
+    ${insBlock('Primary Medical Insurance','pm_')}
+    ${insBlock('Secondary Medical Insurance','sm_')}
+    <div class="stt">Signature</div>
+    ${pt.sigs.ins?`<img class="sigimg" src="${pt.sigs.ins}" alt="Signature"><div class="lbl" style="margin-top:4px">Date: ${f(ins.ins_dt)}</div>`:''}
+    </div>`;
+  }
+
+  if (pt.forms.hh.done) {
+    const row = (label, val) => `<div class="field"><div class="lbl">${label}</div><div class="val">${val}</div></div>`;
+    html += `<div class="card">
+    <strong style="font-size:1rem;color:#1F3A5F">3. Health History</strong>
+    <div class="stt">General</div><div class="grid2">
+      ${row('Height', f(hh.height))} ${row('Weight', f(hh.weight))}
+      ${row('Under Physician Care', yn(hh.physician_care))}
+      ${row('Physician', [hh.phys_name,hh.phys_phone].filter(Boolean).join(' · ')||'—')}
+      ${row('In Good Health', yn(hh.good_health))} ${row('Last Physical', f(hh.last_phys))}
+      ${row('Current Pharmacy', f(hh.pharmacy))}
+      ${row('Prior Surgeries/Hospitalizations', `${yn(hh.serious_ill)}${hh.serious_desc?' — '+hh.serious_desc:''}`)}
+    </div>
+    <div class="stt">Medical Conditions</div><div class="grid2">
+      ${CONDITIONS.map(([field,lbl])=>row(lbl,yn(hh[field]))).join('')}
+    </div>
+    <div class="stt">Current Medications</div><div class="grid2">
+      ${MEDS.map(([field,lbl])=>row(lbl,yn(hh[field]))).join('')}
+    </div>
+    ${hh.meds?`<div style="margin-top:9px;padding:9px;background:#f4f6f8;border-radius:6px;font-size:.82rem"><strong>All medications:</strong><br>${hh.meds}</div>`:''}
+    <div class="stt">Allergies</div><div class="grid2">
+      ${ALLERGIES.map(([field,lbl])=>row(lbl,yn(hh[field]))).join('')}
+      ${hh.abx_list?`<div class="field full"><div class="lbl">Antibiotic allergies</div><div class="val">${hh.abx_list}</div></div>`:''}
+      ${hh.other_allergy?`<div class="field full"><div class="lbl">Other allergies</div><div class="val">${hh.other_allergy}</div></div>`:''}
+    </div>
+    <div class="stt">Lifestyle &amp; Additional</div><div class="grid2">
+      ${LIFESTYLE.map(([field,lbl])=>row(lbl,yn(hh[field]))).join('')}
+      ${hh.tobacco_amt?`<div class="field"><div class="lbl">Tobacco amount/day</div><div class="val">${hh.tobacco_amt}</div></div>`:''}
+    </div>
+    <div class="stt">For Women Only</div><div class="grid2">
+      ${WOMEN.map(([field,lbl])=>row(lbl,yn(hh[field]))).join('')}
+    </div>
+    <div class="stt">Signature</div>
+    ${pt.sigs.hh?`<img class="sigimg" src="${pt.sigs.hh}" alt="Signature"><div class="lbl" style="margin-top:4px">Date: ${f(hh.hh_dt)}</div>`:''}
+    </div>`;
+  }
+
+  if (pt.forms.hipaa.done) {
+    html += `<div class="card">
+    <strong style="font-size:1rem;color:#1F3A5F">4. HIPAA Privacy Notice</strong>
+    <div style="padding:10px;background:#e9f7ef;border-radius:6px;font-size:.86rem;color:#196f3d;font-weight:700;margin-top:10px">✓ Patient acknowledged receipt of the HIPAA Privacy Practices Notice.</div>
+    <div class="stt">Signature</div>
+    ${pt.sigs.hipaa?`<img class="sigimg" src="${pt.sigs.hipaa}" alt="Signature"><div class="lbl" style="margin-top:4px">Date: ${f(pt.forms.hipaa.data?.date)}</div>`:''}
+    </div>`;
+  }
+  return html;
+}
+
+// ─── EMAIL ────────────────────────────────────────────────────────────
+function sendEmail(pt) {
+  // EmailJS setup: https://emailjs.com
+  // 1. Create account → Email Services → connect Gmail
+  // 2. Create Email Template with: {{to_email}} {{patient_name}} {{patient_email}} {{summary}} {{submitted_at}}
+  // 3. Replace EMAILJS_KEY, EMAILJS_SVC, EMAILJS_TPL constants at top of script
+  if (EMAILJS_KEY==='YOUR_EMAILJS_PUBLIC_KEY') {
+    console.log('[OMS] EmailJS not configured — form saved locally for:', pt.email);
+    return;
+  }
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+  script.onload = () => {
+    emailjs.init(EMAILJS_KEY);
+    const done = Object.entries(pt.forms).filter(([,f])=>f.done).map(([k])=>({pi:'Patient Info',ins:'Insurance',hh:'Health History',hipaa:'HIPAA'})[k]).join(', ');
+    emailjs.send(EMAILJS_SVC, EMAILJS_TPL, {
+      to_email: ADMIN_EMAIL,
+      patient_name: pt.name||pt.email,
+      patient_email: pt.email,
+      summary: `Forms completed: ${done}`,
+      submitted_at: new Date().toLocaleString()
+    }).catch(e=>console.warn('[OMS] Email failed:',e));
+  };
+  document.head.appendChild(script);
+}
+
+// ─── UTIL ─────────────────────────────────────────────────────────────
+function showErr(id,msg){ const el=document.getElementById(id); if(el){el.textContent=msg;el.classList.remove('hidden');} }
+function hideErr(id){ const el=document.getElementById(id); if(el) el.classList.add('hidden'); }
+
+// ─── INIT ─────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  // SSN auto-format
+  document.getElementById('f_ssn').addEventListener('input',function(){
+    let n=this.value.replace(/\D/g,'');
+    if(n.length>5) n=n.slice(0,3)+'-'+n.slice(3,5)+'-'+n.slice(5,9);
+    else if(n.length>3) n=n.slice(0,3)+'-'+n.slice(3);
+    this.value=n;
+  });
+  // Auto-calc age from DOB
+  document.getElementById('f_dob').addEventListener('change',function(){
+    const dob=new Date(this.value), today=new Date();
+    let age=today.getFullYear()-dob.getFullYear();
+    if(today.getMonth()<dob.getMonth()||(today.getMonth()===dob.getMonth()&&today.getDate()<dob.getDate()))age--;
+    const el=document.getElementById('f_age'); if(el&&age>0) el.value=age;
+  });
+  // Email field: prefill from entry
+  document.getElementById('f_email').addEventListener('focus',function(){
+    if(!this.value&&curEmail) this.value=curEmail;
+  });
+  // Check admin session
+  if(sessionStorage.getItem('oms_admin')){
+    // Session persists but don't auto-navigate
+  }
+});
+</script>
+</body>
+</html>
