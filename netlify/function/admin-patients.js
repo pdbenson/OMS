@@ -15,7 +15,7 @@ exports.handler = async (event) => {
   try {
     const { data: patients, error: pErr } = await supabase
       .from('patients')
-      .select('id, email, first_name, last_name, status, edition_number, last_activity, completed_at, assigned_consents')
+      .select('id, email, first_name, last_name, status, edition_number, last_activity, completed_at, assigned_consents, appointment_date')
       .order('last_activity', { ascending: false });
 
     if (pErr) throw pErr;
@@ -48,6 +48,7 @@ exports.handler = async (event) => {
       lastActivity:    p.last_activity,
       completedAt:     p.completed_at,
       assignedConsents: p.assigned_consents || [],
+      appointmentDate: p.appointment_date || null,
       forms:           formsByPatient[p.id] || {},
     }));
 

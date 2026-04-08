@@ -115,11 +115,18 @@ exports.handler = async (event) => {
     // Send admin notification on final submission (NO PHI in email)
     if (isFinal) {
       const adminUrl = `${process.env.SITE_URL || 'https://oms.tapat.dev'}/`;
-      await sendAdminNotification(
-        `${patient.first_name || ''} ${patient.last_name || ''}`.trim(),
-        email,
-        adminUrl
-      ).catch(e => console.error('[notify]', e.message));
+      if (!process.env.SMTP_HOST) {
+        console.log('[notify] *** NEW PATIENT INTAKE SUBMITTED ***');
+        console.log('[notify] Patient email:', email);
+        console.log('[notify] Submitted at:', now);
+        console.log('[notify] SMTP not configured — set SMTP_HOST in Netlify env vars to enable email notifications');
+      } else {
+        await sendAdminNotification(
+          `${patient.first_name || ''} ${patient.last_name || ''}`.trim(),
+          email,
+          adminUrl
+        ).catch(e => console.error('[notify]', e.message));
+      }
     }
 
     return ok({ submitted: true, final: !!isFinal });
