@@ -1,0 +1,12 @@
+{
+  "name": "oms-intake-functions",
+  "version": "1.0.0",
+  "description": "Netlify functions for Davis Center OMS Intake",
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "nodemailer": "^6.9.8"
+  }
+}
