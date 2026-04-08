@@ -3,11 +3,8 @@
   functions = "netlify/function"
   command = "npm install"
 
-# Tell secrets scanner to ignore these keys —
-# the email appears legitimately throughout the site HTML,
-# and the password placeholder is in example/docs files only.
 [build.environment]
-  SECRETS_SCAN_OMIT_KEYS = "ADMIN_NOTIFY_EMAIL,ADMIN_PASSWORD"
+  SECRETS_SCAN_OMIT_KEYS = "ADMIN_EMAIL,ADMIN_NOTIFY_EMAIL,ADMIN_PASSWORD"
 
 [[headers]]
   for = "/*"
