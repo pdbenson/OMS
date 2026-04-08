@@ -151,6 +151,36 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
 <div class="overlay hidden" id="consentOverlay"><div class="mbox"><h3>Assign Consent Forms</h3><p id="consentModalSub"></p><div class="clist" id="consentCheckList"></div><div class="modal-btns"><button class="btn bS" onclick="closeConsentModal()">Cancel</button><button class="btn bP" onclick="saveConsentAssignment()">Save Assignment</button></div></div></div>
 <div class="overlay hidden" id="editionOverlay"><div class="mbox"><h3>Forms Already Completed</h3><p id="editionModalMsg"></p><div class="modal-btns"><button class="btn bS" onclick="closeEditionModal()">Cancel</button><button class="btn bD" onclick="confirmNewEdition()">Create New Edition</button></div></div></div>
 <div class="toast" id="toast"></div>
+<div class="overlay hidden" id="reminderApptOverlay">
+  <div class="mbox">
+    <h3>Schedule Details</h3>
+    <p id="reminderApptSub">Enter the patient's upcoming appointment so we can include it in the reminder email.</p>
+    <div class="fg" style="margin-bottom:14px">
+      <div class="fd"><label class="lbl">Appointment Date <span class="req">*</span></label><input type="date" class="inp" id="reminderApptDate"></div>
+      <div class="fd"><label class="lbl">Appointment Time <span class="req">*</span></label><input type="time" class="inp" id="reminderApptTime"></div>
+    </div>
+    <div id="reminderApptErr" class="alert ae hidden"></div>
+    <div class="modal-btns">
+      <button class="btn bS" onclick="closeReminderApptModal()">Cancel</button>
+      <button class="btn bP" onclick="previewReminderEmail()">Preview Email &#8594;</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay hidden" id="reminderPreviewOverlay">
+  <div class="mbox" style="max-width:580px">
+    <h3>Reminder Email Preview</h3>
+    <p style="margin-bottom:12px">Review the email below before sending. This will be sent to <strong id="reminderPreviewEmail"></strong>.</p>
+    <div id="reminderEmailPreview" style="background:var(--surf);border-radius:var(--r);padding:18px;font-size:.85rem;line-height:1.7;border:1px solid var(--bdr);max-height:380px;overflow-y:auto"></div>
+    <div id="reminderSendErr" class="alert ae hidden" style="margin-top:10px"></div>
+    <div id="reminderSendOk" class="alert ao hidden" style="margin-top:10px"></div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn bS" onclick="closeReminderPreviewModal()">&#8592; Back</button>
+      <button class="btn bG" id="reminderSendBtn" onclick="sendReminderEmail()">&#x2709; Send Reminder</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- LANDING -->
 <div id="vLand" class="view active">
@@ -755,7 +785,7 @@ async function loadDash(){
         +'<td style="white-space:nowrap">'
         +'<button class="btn bP" style="padding:5px 10px;font-size:.75rem" onclick="adminViewPt(\''+p.id+'\',\''+p.email+'\')">View</button>'
         +' <button class="btn bA" style="padding:5px 10px;font-size:.75rem" onclick="openConsentModal(\''+p.id+'\',\''+p.email+'\','+JSON.stringify(p.assignedConsents||[]).replace(/"/g,"'")+')">'
-        +'Forms'+(ca?' ('+ca+')')+'</button></td></tr>';
+        +'Forms'+(ca?' ('+ca+')')+'</button>'        +' <button class="btn" style="padding:5px 10px;font-size:.75rem;background:#e67e22;color:#fff" onclick="openReminderModal(\''+p.id+'\',\''+p.firstName+'\',\''+p.email+'\',\''+p.appointmentDate+'\')">&#x1F514; Remind</button>'        +'</td></tr>';
     }).join('');
   }catch(e){setLoading(false);toast('Could not load patients: '+e.message);}
 }
@@ -878,6 +908,83 @@ function step2HTML(){return'<div class="card"><div class="chdl"><h2>Insurance In
 function step3HTML(){return'<div class="card"><div class="chdl"><h2>Health History</h2><p>All Yes/No questions are required <span class="req">*</span>. This information is kept strictly confidential.</p></div><div class="fg"><div class="fd c2"><label class="lbl">Patient Name</label><input class="inp" id="f_hh_name" readonly></div><div class="fd"><label class="lbl">Date of Birth</label><input type="date" class="inp" id="f_hh_dob" readonly></div><div class="fd"><label class="lbl">Height <span class="req">*</span></label><input class="inp" id="f_hh_ht" placeholder="e.g. 5\'10&quot;"></div><div class="fd"><label class="lbl">Weight <span class="req">*</span></label><input class="inp" id="f_hh_wt" placeholder="e.g. 170 lbs"></div><div class="fd full">'+yn_row('physician_care',"Are you now under a physician's care for a particular problem?",true)+'</div><div class="fd hidden" id="g_phys_name"><label class="lbl">Physician Name</label><input class="inp" id="f_phys_name"></div><div class="fd hidden" id="g_phys_phone"><label class="lbl">Physician Phone</label><input type="tel" class="inp" id="f_phys_phone"></div><div class="fd full">'+yn_row('good_health','Are you in good health?',true)+'</div><div class="fd"><label class="lbl">Date of Last Physical</label><input type="date" class="inp" id="f_last_phys"></div><div class="fd"><label class="lbl">Current Pharmacy</label><input class="inp" id="f_pharmacy"></div><div class="fd full">'+yn_row('serious_ill','Have you ever had any serious illnesses, operations or hospitalizations?',true)+'</div><div class="fd c2 hidden" id="g_serious_desc"><label class="lbl">If so, describe:</label><textarea class="inp" id="f_serious_desc" placeholder="Describe illnesses, surgeries, or hospitalizations"></textarea></div></div><div class="stt">Do You Have or Have You Ever Had <span class="req">*</span></div><p style="font-size:.75rem;color:var(--lt);margin-bottom:8px">All questions required.</p><div class="cgrid" id="condGrid"></div><div class="stt">Are You Using Any of the Following? <span class="req">*</span></div><div class="cgrid" id="medGrid"></div><div class="fg" style="margin-top:12px"><div class="fd full"><label class="lbl">List ALL current medications (prescription, OTC, herbal, vitamins, minerals)</label><textarea class="inp" id="f_meds" placeholder="List medications, dosages, and frequencies..." style="min-height:70px"></textarea></div></div><div class="stt">Allergies &amp; Adverse Reactions <span class="req">*</span></div><div class="cgrid" id="allergyGrid"></div><div class="fg" style="margin-top:10px"><div class="fd"><label class="lbl">Antibiotic allergies (list if applicable)</label><input class="inp" id="f_abx_list" placeholder="List specific antibiotics"></div><div class="fd"><label class="lbl">Other allergies or reactions</label><input class="inp" id="f_other_allergy" placeholder="List other allergies"></div></div><div class="stt">Additional Questions <span class="req">*</span></div><div class="cgrid" id="lifestyleGrid"></div><div class="fd hidden" id="g_tobacco_amt" style="margin-top:9px"><label class="lbl">If tobacco, how much per day?</label><input class="inp" id="f_tobacco_amt"></div><div class="stt" style="color:var(--acc)">For Women Only</div><div class="pol" style="font-size:.75rem;margin-bottom:10px">If you are using Oral Contraceptives, antibiotics may interfere with their effectiveness. You will need to use mechanical forms of birth control for one complete cycle after the course of antibiotics is completed. Please consult with your physician for further guidance.</div><div class="cgrid" id="womenGrid"></div><div style="margin-top:15px;padding:11px;background:var(--surf);border-radius:var(--r);font-size:.79rem;line-height:1.6;font-style:italic">I understand the importance of a truthful Health History to assist the doctor in providing the best care possible. I have had the opportunity to discuss my Health History with my doctor.</div><div class="ssec"><h4>Signature of Person Completing Health History <span class="req">*</span></h4><div class="swrap"><canvas id="sigHH" class="scan"></canvas><div class="sph" id="phHH">Sign here</div></div><div class="sctl"><button class="clrs" onclick="clrSig(\'sigHH\')">Clear</button></div><div class="sdrow"><div class="fd"><label class="lbl">Date</label><input type="date" class="inp" id="f_hh_dt"></div></div></div><div id="err3" class="alert ae hidden"></div><div class="snav"><button class="btn bS" onclick="goStep(2)">&#8592; Back</button><div class="snav-right"><button class="btn bDraft" onclick="saveDraft(3)">Save Draft</button><button class="btn bP" onclick="saveStep(3)">Save &amp; Continue &#8594;</button></div></div></div>';}
 function step4HTML(){return'<div class="card"><div class="chdl"><h2>HIPAA Privacy Notice</h2><p>Please read the following notice, print your name clearly, and sign below to acknowledge receipt.</p></div><div class="pol" style="max-height:320px;font-size:.78rem"><strong>Privacy Promise</strong><br>Davis Center for Oral and Maxillofacial Surgery understands that your medical and health information is personal. We follow strict federal and state laws that require us to maintain the confidentiality of your health information.<br><br><strong>Treatment</strong> &mdash; We keep records of the care and services provided to you. Your doctor may share your health information with a specialist assisting in your treatment.<br><br><strong>Payment</strong> &mdash; We maintain billing records that include payment information. We may contact your insurance company to verify coverage or notify them of upcoming services.<br><br><strong>Health Care Operations</strong> &mdash; We use health information to improve quality of care, train staff, provide customer service, manage costs, and make plans to better serve our community.<br><br><strong>Additional Uses:</strong> Recommend treatment alternatives; tell you about health services that may benefit you; share with family involved in your care when appropriate; share with third parties assisting in treatment, payment and operations.<br><br><strong>Permitted Disclosures Without Authorization:</strong> Public health purposes, health oversight activities, lawsuits, when required by law, law enforcement, to coroners/medical examiners/funeral directors, for workers\' compensation, organ and tissue donation, research under strict federal guidelines, and to protect victims of abuse, neglect, or domestic violence.<br><br><strong>Your Rights:</strong> Request restrictions on how we use your information; request specific communication methods; inspect and copy your health information; request corrections; receive accounting of disclosures; request a paper copy of this notice.<br><br><strong>Contact Our Privacy Officer:</strong><br>Davis Center for Oral and Maxillofacial Surgery &middot; Kerri Jewkes, Privacy Officer<br>890 W. Heritage Park Blvd. Suite 103 &middot; Layton, UT 84041 &middot; (801) 614-0999</div><div class="chk" style="margin-top:13px"><input type="checkbox" id="f_hipaa_ack"><label for="f_hipaa_ack"><strong>I acknowledge</strong> that I have received and read the Privacy Practices Notice of Davis Center for Oral and Maxillofacial Surgery.</label></div><div class="stt" style="margin-top:18px">Patient Name &amp; Signature <span class="req">*</span></div><p style="font-size:.8rem;color:var(--lt);margin-bottom:11px">Please print your first and last name clearly, then sign below.</p><div class="fg"><div class="fd"><label class="lbl">First Name (print clearly) <span class="req">*</span></label><input class="inp" id="f_hipaa_first" placeholder="First name"></div><div class="fd"><label class="lbl">Last Name (print clearly) <span class="req">*</span></label><input class="inp" id="f_hipaa_last" placeholder="Last name"></div></div><div class="ssec"><h4>HIPAA Acknowledgment Signature <span class="req">*</span></h4><div class="swrap"><canvas id="sigHIPAA" class="scan"></canvas><div class="sph" id="phHIPAA">Sign here</div></div><div class="sctl"><button class="clrs" onclick="clrSig(\'sigHIPAA\')">Clear</button></div><div class="sdrow"><div class="fd"><label class="lbl">Date</label><input type="date" class="inp" id="f_hipaa_dt"></div></div></div><div id="err4" class="alert ae hidden"></div><div class="snav"><button class="btn bS" onclick="goStep(3)">&#8592; Back</button><div class="snav-right"><button class="btn bDraft" onclick="saveDraft(4)">Save Draft</button><button class="btn bG" style="min-width:160px" onclick="saveStep(4)">&#x2713; Submit All Forms</button></div></div></div>';}
 
+
+// ── REMINDER EMAIL ────────────────────────────────────────────────────
+let reminderTarget={id:'',firstName:'',email:'',apptDate:'',apptTime:'',dayStr:'',timeStr:''};
+
+function openReminderModal(pid,firstName,email,existingDate){
+  reminderTarget={id:pid,firstName:firstName||'',email:email,apptDate:'',apptTime:'',dayStr:'',timeStr:''};
+  document.getElementById('reminderApptSub').textContent='Sending reminder to '+firstName+' ('+email+'). Enter their upcoming appointment details.';
+  const dateEl=document.getElementById('reminderApptDate');
+  const timeEl=document.getElementById('reminderApptTime');
+  dateEl.value=(existingDate&&existingDate!=='undefined')?existingDate:'';
+  timeEl.value='';
+  hideErr('reminderApptErr');
+  document.getElementById('reminderApptOverlay').classList.remove('hidden');
+}
+function closeReminderApptModal(){document.getElementById('reminderApptOverlay').classList.add('hidden');}
+function closeReminderPreviewModal(){
+  document.getElementById('reminderPreviewOverlay').classList.add('hidden');
+  document.getElementById('reminderApptOverlay').classList.remove('hidden');
+}
+function previewReminderEmail(){
+  const dateVal=document.getElementById('reminderApptDate').value;
+  const timeVal=document.getElementById('reminderApptTime').value;
+  if(!dateVal){showErr('reminderApptErr','Appointment date is required.');return;}
+  if(!timeVal){showErr('reminderApptErr','Appointment time is required.');return;}
+  hideErr('reminderApptErr');
+  const apptDate=new Date(dateVal+'T'+timeVal);
+  const dayStr=apptDate.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const timeStr=apptDate.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
+  reminderTarget.apptDate=dateVal;reminderTarget.apptTime=timeVal;
+  reminderTarget.dayStr=dayStr;reminderTarget.timeStr=timeStr;
+  const fn=reminderTarget.firstName||'Patient';
+  document.getElementById('reminderPreviewEmail').textContent=reminderTarget.email;
+  document.getElementById('reminderEmailPreview').innerHTML=
+    '<div style="border-bottom:2px solid #1F3A5F;padding-bottom:10px;margin-bottom:14px">'
+    +'<strong style="color:#1F3A5F;font-size:.95rem">Davis Center for Oral and Maxillofacial Surgery</strong><br>'
+    +'<span style="color:#6b7a8d;font-size:.78rem">Paul Benson, DMD, MD</span></div>'
+    +'<p><strong>Subject:</strong> Complete Your Preregistration \u2014 Appointment on '+dayStr+' at '+timeStr+'</p>'
+    +'<hr style="border:none;border-top:1px solid #d4dde6;margin:10px 0">'
+    +'<p>Dear <strong>'+fn+'</strong>,</p><br>'
+    +'<p>We look forward to seeing you at Davis Center for Oral and Maxillofacial Surgery on <strong>'+dayStr+' at '+timeStr+'</strong>.</p><br>'
+    +'<p>To help us prepare for your visit and keep your appointment running smoothly, please complete your patient preregistration forms before you arrive. It takes about 10\u201315 minutes and can be done from any device.</p><br>'
+    +'<div style="text-align:center;margin:16px 0"><span style="display:inline-block;background:#3A7CA5;color:#fff;padding:10px 24px;border-radius:6px;font-weight:700;font-size:.9rem">Complete My Preregistration \u2192</span>'
+    +'<div style="font-size:.75rem;color:#6b7a8d;margin-top:5px">oms.tapat.dev</div></div>'
+    +'<p style="color:#6b7a8d;font-size:.82rem">If you have already submitted your forms, please disregard this message.</p><br>'
+    +'<p style="color:#6b7a8d;font-size:.82rem">If you have any questions or need to reschedule, please call us at <strong>(801) 614-0999</strong>.</p><br>'
+    +'<p>We look forward to seeing you soon.</p><br>'
+    +'<p>Warm regards,<br><strong>Davis Center for Oral and Maxillofacial Surgery</strong><br>Paul Benson, DMD, MD<br>'
+    +'<span style="color:#6b7a8d">890 W. Heritage Park Blvd., Suite 103 &middot; Layton, Utah 84041<br>(801) 614-0999 &middot; info.davisoms@gmail.com</span></p>';
+  document.getElementById('reminderSendOk').classList.add('hidden');
+  hideErr('reminderSendErr');
+  document.getElementById('reminderSendBtn').disabled=false;
+  document.getElementById('reminderSendBtn').textContent='\u2709 Send Reminder';
+  document.getElementById('reminderApptOverlay').classList.add('hidden');
+  document.getElementById('reminderPreviewOverlay').classList.remove('hidden');
+}
+async function sendReminderEmail(){
+  if(!checkAdminAuth())return;
+  const btn=document.getElementById('reminderSendBtn');
+  btn.disabled=true;btn.textContent='Sending...';
+  hideErr('reminderSendErr');
+  try{
+    await apiPost('send-reminder',{
+      patientId:reminderTarget.id,email:reminderTarget.email,
+      firstName:reminderTarget.firstName,apptDate:reminderTarget.apptDate,
+      apptTime:reminderTarget.apptTime,dayStr:reminderTarget.dayStr,timeStr:reminderTarget.timeStr
+    },adminToken);
+    document.getElementById('reminderSendOk').textContent='Reminder sent successfully to '+reminderTarget.email;
+    document.getElementById('reminderSendOk').classList.remove('hidden');
+    btn.textContent='\u2713 Sent';
+    toast('Reminder sent to '+reminderTarget.firstName+' \u2713');
+    setTimeout(()=>{document.getElementById('reminderPreviewOverlay').classList.add('hidden');loadDash();},2200);
+  }catch(e){
+    btn.disabled=false;btn.textContent='\u2709 Send Reminder';
+    showErr('reminderSendErr','Failed to send: '+e.message);
+  }
+}
+
 function buildStepsHTML(){
   document.getElementById('intakeCW').innerHTML='<div id="s1">'+step1HTML()+'</div><div id="s2" class="hidden">'+step2HTML()+'</div><div id="s3" class="hidden">'+step3HTML()+'</div><div id="s4" class="hidden">'+step4HTML()+'</div>';
   const ssn=document.getElementById('f_ssn'); // intentionally undefined — SSN removed
@@ -889,6 +996,8 @@ function buildStepsHTML(){
 
 // ── MODAL CLOSE ON OVERLAY CLICK ──────────────────────────────────────
 document.getElementById('consentOverlay').addEventListener('click',function(e){if(e.target===this)closeConsentModal();});
+document.getElementById('reminderApptOverlay').addEventListener('click',function(e){if(e.target===this)closeReminderApptModal();});
+document.getElementById('reminderPreviewOverlay').addEventListener('click',function(e){if(e.target===this)closeReminderPreviewModal();});
 document.getElementById('editionOverlay').addEventListener('click',function(e){if(e.target===this)closeEditionModal();});
 </script>
 </body>
