@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HIPAA Compliance — Davis Center for Oral and Maxillofacial Surgery</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--pri:#3A7CA5;--sec:#1F3A5F;--acc:#6FB3B8;--txt:#2E2E2E;--lt:#6b7a8d;--surf:#F4F6F8;--bdr:#d4dde6;--ok:#2e8b57;--r:8px;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:#fff;color:var(--txt);line-height:1.7}
+a{color:var(--pri);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* HEADER */
+.site-hdr{background:var(--sec);color:#fff;padding:0}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;max-width:960px;margin:0 auto}
+.hdr-logo{font-family:'Libre Baskerville',serif;font-size:1rem;font-weight:700;line-height:1.3}
+.hdr-sub{font-size:.78rem;opacity:.7;margin-top:2px}
+.hdr-back{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.2);color:#fff;padding:7px 16px;border-radius:var(--r);font-family:'Nunito',sans-serif;font-size:.82rem;cursor:pointer;text-decoration:none;transition:background .2s;white-space:nowrap}
+.hdr-back:hover{background:rgba(255,255,255,.25);text-decoration:none}
+.page-banner{background:linear-gradient(135deg,#1a3254 0%,#2a5a8a 100%);padding:36px 32px;text-align:center}
+.page-banner h1{font-family:'Libre Baskerville',serif;font-size:1.9rem;color:#fff;margin-bottom:8px}
+.page-banner p{color:rgba(255,255,255,.75);font-size:.95rem;max-width:600px;margin:0 auto}
+.badge-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.badge{background:rgba(111,179,184,.25);border:1px solid rgba(111,179,184,.5);color:#b8e0e3;padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:700;letter-spacing:.04em}
+
+/* CONTENT */
+.content{max-width:860px;margin:0 auto;padding:48px 24px 72px}
+.section{margin-bottom:48px}
+.section-hdr{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid var(--acc)}
+.section-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--pri),var(--acc));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.section-hdr h2{font-family:'Libre Baskerville',serif;font-size:1.25rem;color:var(--sec)}
+.section p{color:var(--txt);margin-bottom:14px;font-size:.95rem}
+.section p:last-child{margin-bottom:0}
+
+/* CARDS */
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px}
+.card{background:var(--surf);border-radius:var(--r);padding:18px;border-left:4px solid var(--acc)}
+.card h4{font-size:.88rem;font-weight:700;color:var(--sec);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.card p{font-size:.84rem;color:var(--lt);line-height:1.6;margin:0}
+.card.green{border-left-color:var(--ok)}
+.card.navy{border-left-color:var(--sec)}
+
+/* SAFEGUARD LIST */
+.safeguard-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.safeguard-list li{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--surf);border-radius:var(--r)}
+.safeguard-list li .ico{width:28px;height:28px;border-radius:6px;background:var(--ok);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;margin-top:1px}
+.safeguard-list li .ico.blue{background:var(--pri)}
+.safeguard-list li .ico.navy{background:var(--sec)}
+.safeguard-list li div strong{display:block;font-size:.88rem;color:var(--sec);margin-bottom:3px}
+.safeguard-list li div span{font-size:.82rem;color:var(--lt);line-height:1.5}
+
+/* RIGHTS */
+.rights-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:4px}
+.right-item{background:var(--surf);border-radius:var(--r);padding:16px;text-align:center}
+.right-item .ri-ico{font-size:1.6rem;margin-bottom:8px}
+.right-item h4{font-size:.82rem;font-weight:700;color:var(--sec);margin-bottom:5px}
+.right-item p{font-size:.76rem;color:var(--lt);line-height:1.5}
+
+/* CONTACT BOX */
+.contact-box{background:var(--sec);color:#fff;border-radius:var(--r);padding:28px 32px;display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap}
+.contact-box h3{font-family:'Libre Baskerville',serif;font-size:1.1rem;margin-bottom:8px}
+.contact-box p{font-size:.88rem;color:rgba(255,255,255,.8);line-height:1.7;margin:0}
+.contact-box a{color:var(--acc)}
+.contact-divider{width:1px;background:rgba(255,255,255,.2);align-self:stretch;min-height:60px}
+
+/* NOTICE */
+.notice{background:#EAF4FC;border-left:4px solid var(--pri);border-radius:0 var(--r) var(--r) 0;padding:14px 18px;font-size:.85rem;color:#1a5276;margin-top:4px;line-height:1.6}
+.notice strong{display:block;margin-bottom:4px}
+
+/* EFFECTIVE DATE */
+.effective{text-align:center;color:var(--lt);font-size:.8rem;margin-top:48px;padding-top:24px;border-top:1px solid var(--bdr)}
+
+/* FOOTER */
+.site-ftr{background:var(--sec);color:rgba(255,255,255,.6);text-align:center;padding:20px 24px;font-size:.78rem;line-height:1.8}
+.site-ftr a{color:var(--acc)}
+.ftr-nav{display:flex;gap:16px;justify-content:center;margin-top:8px;flex-wrap:wrap}
+.ftr-nav a{color:rgba(255,255,255,.55);font-size:.76rem}
+.ftr-nav a:hover{color:#fff}
+.ftr-sep{color:rgba(255,255,255,.25)}
+
+@media(max-width:640px){
+  .card-grid,.rights-grid{grid-template-columns:1fr}
+  .hdr-top{flex-direction:column;gap:12px;text-align:center}
+  .page-banner h1{font-size:1.45rem}
+  .contact-box{flex-direction:column;gap:16px}
+  .contact-divider{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="site-hdr">
+  <div class="hdr-top">
+    <div>
+      <div class="hdr-logo">Davis Center for Oral and Maxillofacial Surgery</div>
+      <div class="hdr-sub">Paul Benson, DMD, MD &middot; Layton, Utah</div>
+    </div>
+    <a href="/" class="hdr-back">&#8592; Return to Portal</a>
+  </div>
+  <div class="page-banner">
+    <h1>HIPAA Compliance</h1>
+    <p>How we protect your protected health information and uphold your rights as a patient under the Health Insurance Portability and Accountability Act.</p>
+    <div class="badge-row">
+      <span class="badge">&#x1F512; Encrypted at Rest</span>
+      <span class="badge">&#x1F6E1; HTTPS / TLS in Transit</span>
+      <span class="badge">&#x1F4CB; Audit Logged</span>
+      <span class="badge">&#x23F1; 15-Min Session Timeout</span>
+      <span class="badge">&#x26D4; No PHI in Emails</span>
+    </div>
+  </div>
+</header>
+
+<main class="content">
+
+  <!-- OUR COMMITMENT -->
+  <section class="section">
+    <div class="section-hdr">
+      <div class="section-icon">&#x1F3E5;</div>
+      <h2>Our Commitment to HIPAA</h2>
+    </div>
+    <p>Davis Center for Oral and Maxillofacial Surgery is a covered entity under the Health Insurance Portability and Accountability Act of 1996 (HIPAA) and the HITECH Act. We are committed to maintaining the privacy and security of your Protected Health Information (PHI) in full compliance with the HIPAA Privacy Rule (45 CFR Part 164 Subpart E) and the HIPAA Security Rule (45 CFR Part 164 Subpart C).</p>
+    <p>This document describes the specific technical, administrative, and physical safeguards we have implemented in our patient preregistration portal at OMS.tapat.dev.</p>
+    <div class="notice">
+      <strong>Privacy Officer</strong>
+      Questions, concerns, or complaints regarding our HIPAA compliance should be directed to our designated Privacy Officer: Kerri Jewkes &middot; Davis Center for Oral and Maxillofacial Surgery &middot; 890 W. Heritage Park Blvd., Suite 103, Layton, UT 84041 &middot; (801) 614-0999
+    </div>
+  </section>
+
+  <!-- TECHNICAL SAFEGUARDS -->
+  <section class="section">
+    <div class="section-hdr">
+      <div class="section-icon">&#x1F4BB;</div>
+      <h2>Technical Safeguards</h2>
+    </div>
+    <p>The following technical controls are implemented in our patient portal to protect PHI from unauthorized access, modification, or disclosure.</p>
+    <ul class="safeguard-list">
+      <li>
+        <div class="ico">&#x1F512;</div>
+        <div><strong>Encryption at Rest</strong><span>All patient data — including health history, insurance information, demographic details, and electronic signatures — is stored in Supabase, a SOC 2 Type II certified cloud database. Data is encrypted at rest using AES-256. No PHI is stored in browser localStorage, sessionStorage, or cookies.</span></div>
+      </li>
+      <li>
+        <div class="ico">&#x1F6E1;</div>
+        <div><strong>Encryption in Transit</strong><span>All communication between your browser and our servers is encrypted using TLS 1.2 or higher (HTTPS). Data submitted through the portal is never transmitted over unencrypted connections. Our SSL certificate is provisioned and auto-renewed by Netlify.</span></div>
+      </li>
+      <li>
+        <div class="ico blue">&#x1F510;</div>
+        <div><strong>Access Controls &amp; Authentication</strong><span>Patient access is controlled through short-lived JSON Web Tokens (JWT) that expire after 24 hours. Patient identity is verified using email address plus date of birth for returning users. Administrative access requires email and password authentication — credentials are never stored in application code or transmitted to the browser. Admin passwords are stored exclusively as environment variables on the server.</span></div>
+      </li>
+      <li>
+        <div class="ico blue">&#x23F1;</div>
+        <div><strong>Automatic Session Timeout</strong><span>Administrative sessions automatically expire after 15 minutes of inactivity. A countdown timer is displayed to the admin user, with the option to renew before expiration. Upon timeout, the session is invalidated and the user must re-authenticate to access patient records.</span></div>
+      </li>
+      <li>
+        <div class="ico navy">&#x1F4CB;</div>
+        <div><strong>Audit Logging</strong><span>All significant events are recorded in a tamper-evident audit log stored in our secure database. Logged events include: patient record creation, identity verification attempts (successful and failed), form submissions, admin logins (successful and failed), admin patient record access, and consent form assignments. Each entry records the action, actor, timestamp, and IP address.</span></div>
+      </li>
+      <li>
+        <div class="ico navy">&#x1F4E7;</div>
+        <div><strong>No PHI in Email Communications</strong><span>Automated email notifications sent to administrative staff upon form completion contain no patient health information. Notification emails contain only a generic message indicating that a new submission is available, along with a link to the secure admin portal. Patients are encouraged to use the secure portal rather than email for any health-related communications.</span></div>
+      </li>
+      <li>
+        <div class="ico">&#x1F5C4;</div>
+        <div><strong>Database Access Controls — Row Level Security</strong><span>Our database enforces Row Level Security (RLS) on all patient tables. Direct database access is restricted to authenticated server-side functions using the service role key. The public API key, which is visible to browsers, has zero permissions on any patient data table. This means that even if API credentials were exposed, no PHI could be accessed without a valid server-side authentication token.</span></div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- WHAT WE COLLECT -->
+  <section class="section">
+    <div class="section-hdr">
+      <div class="section-icon">&#x1F4C4;</div>
+      <h2>What PHI We Collect &amp; Why</h2>
+    </div>
+    <p>We collect only the minimum necessary PHI to accomplish the purposes for which it is collected, consistent with the HIPAA Minimum Necessary standard.</p>
+    <div class="card-grid">
+      <div class="card">
+        <h4>&#x1F464; Demographic Information</h4>
+        <p>Name, date of birth, address, phone numbers, email, employer, and marital status. Collected to identify patients and facilitate billing and communication.</p>
+      </div>
+      <div class="card">
+        <h4>&#x1FA7A; Health History</h4>
+        <p>Medical conditions, current medications, allergies, and surgical history. Required to ensure safe treatment and appropriate anesthesia protocols.</p>
+      </div>
+      <div class="card">
+        <h4>&#x1F4B3; Insurance Information</h4>
+        <p>Insurance carrier, policy holder, policy and group numbers. Collected to facilitate claims submission on your behalf. Social Security Numbers are not collected through this portal.</p>
+      </div>
+      <div class="card">
+        <h4>&#x270F; Electronic Signatures</h4>
+        <p>Canvas-based signatures for financial agreement, privacy practices acknowledgment, insurance acknowledgment, health history, and HIPAA notice. Stored as encrypted image data.</p>
+      </div>
+      <div class="card green">
+        <h4>&#x26D4; What We Do NOT Collect</h4>
+        <p>Social Security Numbers, credit card numbers, government ID numbers, or biometric identifiers are not collected through this portal.</p>
+      </div>
+      <div class="card green">
+        <h4>&#x1F4CA; Minimal Tracking</h4>
+        <p>We do not use advertising trackers, third-party analytics, or marketing cookies. IP addresses are logged only for security audit purposes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADMINISTRATIVE SAFEGUARDS -->
+  <section class="section">
+    <div class="section-hdr">
+      <div class="section-icon">&#x1F4BC;</div>
+      <h2>Administrative Safeguards</h2>
+    </div>
+    <ul class="safeguard-list">
+      <li>
+        <div class="ico navy">&#x1F46E;</div>
+        <div><strong>Designated Privacy Officer</strong><span>Kerri Jewkes serves as our designated HIPAA Privacy Officer, responsible for developing and implementing our privacy policies, receiving and investigating complaints, and ensuring workforce compliance with privacy practices.</span></div>
+      </li>
+      <li>
+        <div class="ico navy">&#x1F91D;</div>
+        <div><strong>Business Associate Agreements</strong><span>We have executed or are in the process of executing Business Associate Agreements (BAAs) with all vendors who handle PHI on our behalf, including our cloud database provider, email service provider, and electronic health record system. Vendors without executed BAAs are not permitted to process PHI.</span></div>
+      </li>
+      <li>
+        <div class="ico navy">&#x1F4DA;</div>
+        <div><strong>Workforce Training</strong><span>All staff with access to PHI receive HIPAA privacy and security training upon hire and annually thereafter. Access to the administrative portal is limited to staff with a legitimate need to access patient records.</span></div>
+      </li>
+      <li>
+        <div class="ico blue">&#x26A0;</div>
+        <div><strong>Breach Notification Procedures</strong><span>In the event of a breach of unsecured PHI, we will notify affected individuals within 60 days of discovery, as required by the HIPAA Breach Notification Rule (45 CFR Part 164 Subpart D). We will also notify the Secretary of Health and Human Services and, for breaches affecting 500 or more individuals, prominent media outlets in the affected state.</span></div>
+      </li>
+      <li>
+        <div class="ico blue">&#x1F504;</div>
+        <div><strong>Regular Risk Assessment</strong><span>We conduct periodic security risk assessments to identify potential vulnerabilities in our systems and processes. Identified risks are addressed through our risk management plan to reduce threats to the confidentiality, integrity, and availability of PHI.</span></div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- YOUR RIGHTS -->
+  <section class="section">
+    <div class="section-hdr">
+      <div class="section-icon">&#x2696;</div>
+      <h2>Your Patient Rights Under HIPAA</h2>
+    </div>
+    <p>As a patient of Davis Center for Oral and Maxillofacial Surgery, you have the following rights regarding your protected health information:</p>
+    <div class="rights-grid">
+      <div class="right-item">
+        <div class="ri-ico">&#x1F4CB;</div>
+        <h4>Right to Access</h4>
+        <p>You have the right to inspect and receive a copy of your health information, including medical records and billing records.</p>
+      </div>
+      <div class="right-item">
+        <div class="ri-ico">&#x270F;</div>
+        <h4>Right to Amend</h4>
+        <p>You may request corrections or additions to your health information if you believe it is inaccurate or incomplete.</p>
+      </div>
+      <div class="right-item">
+        <div class="ri-ico">&#x1F4DC;</div>
+        <h4>Right to an Accounting</h4>
+        <p>You may request a list of disclosures we have made of your health information for purposes other than treatment, payment, or operations.</p>
+      </div>
+      <div class="right-item">
+        <div class="ri-ico">&#x1F6AB;</div>
+        <h4>Right to Restrict</h4>
+        <p>You may request restrictions on how we use or disclose your health information. We will consider all requests carefully.</p>
+      </div>
+      <div class="right-item">
+        <div class="ri-ico">&#x1F4DE;</div>
+        <h4>Right to Confidential Communications</h4>
+        <p>You may request that we contact you in a specific way or at a specific location (e.g., home vs. work phone).</p>
+      </div>
+      <div class="right-item">
+        <div class="ri-ico">&#x1F4C3;</div>
+        <h4>Right to a Paper Copy</h4>
+        <p>You may request a paper copy of our Notice of Privacy Practices at any time, even if you agreed to receive it electronically.</p>
+      </div>
+    </div>
+    <div class="notice" style="margin-top:20px">
+      <strong>How to Exercise Your Rights</strong>
+      To exercise any of the above rights, please contact our Privacy Officer in writing at: Davis Center for Oral and Maxillofacial Surgery, Attn: Kerri Jewkes, 890 W. Heritage Park Blvd., Suite 103, Layton, UT 84041, or by phone at (801) 614-0999. We will respond to your request within 30 days.
+    </div>
+  </section>
+
+  <!-- COMPLAINTS -->
+  <section class="section">
+    <div class="section-hdr">
+      <div class="section-icon">&#x1F4AC;</div>
+      <h2>Filing a Complaint</h2>
+    </div>
+    <p>If you believe your privacy rights have been violated, you have the right to file a complaint with us or with the U.S. Department of Health and Human Services. You will not be retaliated against for filing a complaint.</p>
+    <div class="card-grid">
+      <div class="card navy">
+        <h4>&#x1F3E5; File with Our Practice</h4>
+        <p>Contact Kerri Jewkes, Privacy Officer<br>890 W. Heritage Park Blvd., Suite 103<br>Layton, UT 84041<br>(801) 614-0999</p>
+      </div>
+      <div class="card navy">
+        <h4>&#x1F1FA;&#x1F1F8; File with HHS</h4>
+        <p>U.S. Department of Health and Human Services<br>Office for Civil Rights<br><a href="https://www.hhs.gov/ocr/privacy/hipaa/complaints/" target="_blank" style="color:var(--acc)">hhs.gov/ocr/privacy/hipaa/complaints</a><br>1-800-368-1019</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section">
+    <div class="contact-box">
+      <div style="flex:1">
+        <h3>Questions About Your Privacy?</h3>
+        <p>Contact our Privacy Officer or front desk team. We are committed to addressing your privacy questions promptly and thoroughly.</p>
+      </div>
+      <div class="contact-divider"></div>
+      <div style="flex:1">
+        <p>
+          <strong style="color:#fff">Davis Center for Oral and Maxillofacial Surgery</strong><br>
+          890 W. Heritage Park Blvd., Suite 103<br>
+          Layton, Utah 84041<br>
+          <a href="tel:8016140999">(801) 614-0999</a><br>
+          <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="effective">
+    Effective Date: January 1, 2025 &middot; Last Reviewed: April 2026<br>
+    This document is reviewed annually and updated as needed to reflect changes in our practices or applicable law.
+  </div>
+
+</main>
+
+<footer class="site-ftr">
+  <div>&copy; 2026 Davis Center for Oral and Maxillofacial Surgery &middot; All Rights Reserved</div>
+  <div class="ftr-nav">
+    <a href="/">Patient Portal</a>
+    <span class="ftr-sep">|</span>
+    <a href="/hipaa-compliance.html">HIPAA Compliance</a>
+    <span class="ftr-sep">|</span>
+    <a href="/terms-privacy.html">Terms &amp; Privacy</a>
+  </div>
+</footer>
+
+</body>
+</html>
