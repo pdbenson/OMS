@@ -760,6 +760,24 @@ function checkAdminAuth(){
 }
 
 // ── ADMIN DASHBOARD ───────────────────────────────────────────────────
+function buildPatientRow(p,done,isDraft,ed,ca){
+  const ac=JSON.stringify(p.assignedConsents||[]);
+  const td='<td style="white-space:nowrap">'
+    +'<button class="btn bP" style="padding:5px 10px;font-size:.75rem" onclick="adminViewPt('+JSON.stringify(p.id)+','+JSON.stringify(p.email)+')">View</button> '
+    +'<button class="btn bA" style="padding:5px 10px;font-size:.75rem" onclick="openConsentModal('+JSON.stringify(p.id)+','+JSON.stringify(p.email)+','+JSON.stringify(p.assignedConsents||[])+')">Forms'+(ca?' ('+ca+')':'')+'</button> '
+    +'<button class="btn" style="padding:5px 10px;font-size:.75rem;background:#e67e22;color:#fff" onclick="openReminderModal('+JSON.stringify(p.id)+','+JSON.stringify(p.firstName||'')+','+JSON.stringify(p.email)+','+JSON.stringify(p.appointmentDate||'')+')">&#x1F514; Remind</button>'
+    +'</td>';
+  return '<tr>'
+    +'<td><strong>'+(p.firstName||'&mdash;')+'</strong></td>'
+    +'<td><strong>'+(p.lastName||'&mdash;')+'</strong></td>'
+    +'<td style="font-size:.78rem;color:var(--lt)">'+p.email+'</td>'
+    +'<td>'+(done.map(d=>'<span class="bdg bd">'+d+'</span>').join(' ')||'<span class="bdg" style="background:#eee;color:#999">None</span>')+isDraft+'</td>'
+    +'<td>'+(p.completedAt?new Date(p.completedAt).toLocaleDateString():'&mdash;')+'</td>'
+    +'<td>'+(p.lastActivity?new Date(p.lastActivity).toLocaleDateString():'&mdash;')+'</td>'
+    +'<td>'+(p.editionNumber>1?'Ed.'+p.editionNumber:'1')+ed+'</td>'
+    +td+'</tr>';
+}
+
 async function loadDash(){
   if(!checkAdminAuth())return;
   setLoading(true,'Loading patients...');
@@ -774,18 +792,7 @@ async function loadDash(){
       const ed=p.editionNumber>1?' <span class="bdg" style="background:#f0f0f0;color:#666">Ed.'+p.editionNumber+'</span>':'';
       const isDraft=p.status==='draft'?' <span class="bdg" style="background:#f0f4ff;color:#3A7CA5">Draft</span>':'';
       const ca=(p.assignedConsents||[]).length;
-      return'<tr>'
-        +'<td><strong>'+(p.firstName||'&mdash;')+'</strong></td>'
-        +'<td><strong>'+(p.lastName||'&mdash;')+'</strong></td>'
-        +'<td style="font-size:.78rem;color:var(--lt)">'+p.email+'</td>'
-        +'<td>'+(done.map(d=>'<span class="bdg bd">'+d+'</span>').join(' ')||'<span class="bdg" style="background:#eee;color:#999">None</span>')+isDraft+'</td>'
-        +'<td>'+(p.completedAt?new Date(p.completedAt).toLocaleDateString():'&mdash;')+'</td>'
-        +'<td>'+(p.lastActivity?new Date(p.lastActivity).toLocaleDateString():'&mdash;')+'</td>'
-        +'<td>'+(p.editionNumber>1?'Ed.'+p.editionNumber:'1')+ed+'</td>'
-        +'<td style="white-space:nowrap">'
-        +'<button class="btn bP" style="padding:5px 10px;font-size:.75rem" onclick="adminViewPt(\''+p.id+'\',\''+p.email+'\')">View</button>'
-        +' <button class="btn bA" style="padding:5px 10px;font-size:.75rem" onclick="openConsentModal(\''+p.id+'\',\''+p.email+'\','+JSON.stringify(p.assignedConsents||[]).replace(/"/g,"'")+')">'
-        +'Forms'+(ca?' ('+ca+')')+'</button>'        +' <button class="btn" style="padding:5px 10px;font-size:.75rem;background:#e67e22;color:#fff" onclick="openReminderModal(\''+p.id+'\',\''+p.firstName+'\',\''+p.email+'\',\''+p.appointmentDate+'\')">&#x1F514; Remind</button>'        +'</td></tr>';
+      return buildPatientRow(p,done,isDraft,ed,ca);
     }).join('');
   }catch(e){setLoading(false);toast('Could not load patients: '+e.message);}
 }
