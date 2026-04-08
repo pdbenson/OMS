@@ -19,14 +19,14 @@ exports.handler = async (event) => {
   const expectedPassword = process.env.ADMIN_PASSWORD;  // plaintext in env var (never in code)
 
   // Constant-time email comparison
-  const emailMatch = email.trim().toLowerCase() === (expectedEmail || '').toLowerCase();
+  const emailMatch = email.trim().toLowerCase() === (expectedEmail || '').trim().toLowerCase();
 
   // bcryptjs compare if hash provided, otherwise plain compare
   let passwordMatch = false;
   if (process.env.ADMIN_PASSWORD_HASH) {
-    passwordMatch = await bcrypt.compare(password, process.env.ADMIN_PASSWORD_HASH);
+    passwordMatch = await bcrypt.compare(password.trim(), process.env.ADMIN_PASSWORD_HASH.trim());
   } else if (expectedPassword) {
-    passwordMatch = password === expectedPassword;
+    passwordMatch = password.trim() === expectedPassword.trim();
   }
 
   if (!emailMatch || !passwordMatch) {
