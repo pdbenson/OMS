@@ -26,7 +26,7 @@ exports.handler = async (event) => {
     // Create new patient record
     const { data: patient, error } = await supabase
       .from('patients')
-      .insert({ email, status: 'draft' })
+      .insert({ email, status: 'draft', terms_accepted_at: body.termsAcceptedAt || new Date().toISOString() })
       .select('id')
       .single();
 
