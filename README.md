@@ -47,7 +47,7 @@ Go to **Netlify → Site Settings → Environment Variables** and add:
 | `SUPABASE_SERVICE_ROLE_KEY` | Your service role key |
 | `JWT_SECRET` | Generated in Step 2 |
 | `ADMIN_EMAIL` | `info.davisoms@gmail.com` |
-| `ADMIN_PASSWORD` | `D@vis890!` |
+| `ADMIN_PASSWORD` | Your chosen admin password |
 | `SITE_URL` | `https://oms.tapat.dev` |
 | `SMTP_HOST` | Your HIPAA-compliant SMTP host (see Email section) |
 | `SMTP_PORT` | `587` |
@@ -80,7 +80,7 @@ To trigger a manual deploy: Netlify → **Deploys → Trigger Deploy**
 Test these URLs after deploy:
 - `https://oms.tapat.dev/` → Landing page loads
 - `https://oms.tapat.dev/.netlify/functions/patient-check?email=test@test.com` → Returns `{"exists":false}`
-- Admin login with `info.davisoms@gmail.com` / `D@vis890!` → Dashboard loads
+- Admin login with `info.davisoms@gmail.com` / `YOUR_ADMIN_PASSWORD` → Dashboard loads
 
 ---
 
