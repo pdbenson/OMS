@@ -126,7 +126,7 @@ exports.handler = async (event) => {
     if (patientId) {
       await supabase
         .from('patients')
-        .update({ appointment_date: apptDate, last_activity: new Date().toISOString() })
+        .update({ appointment_date: apptDate + (apptTime ? 'T' + apptTime : ''), last_activity: new Date().toISOString() })
         .eq('id', patientId);
     }
 
