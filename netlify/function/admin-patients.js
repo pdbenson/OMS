@@ -1,7 +1,7 @@
 'use strict';
 const {
   supabase, ok, unauthorized, serverError, handleOptions,
-  requireAdmin, logAudit
+  requireAdmin, requireStaff, logAudit
 } = require('./_utils');
 
 exports.handler = async (event) => {
