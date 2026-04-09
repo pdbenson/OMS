@@ -1199,12 +1199,15 @@ let reminderTarget={id:'',firstName:'',email:'',apptDate:'',apptTime:'',dayStr:'
 
 function openReminderModal(pid){
   const _p=_adminPatientCache[pid]||{};
-  const firstName=_p.firstName||'', email=_p.email||'', existingDate=_p.appointmentDate||'';
-  reminderTarget={id:pid,firstName:firstName,email:email,apptDate:'',apptTime:'',dayStr:'',timeStr:''};
+  const firstName=_p.firstName||'', email=_p.email||'', existingAppt=_p.appointmentDate||'';
+  // Parse stored "YYYY-MM-DDTHH:MM" — split on T for date and time
+  const [storedDate='', storedTime=''] = existingAppt.includes('T') ? existingAppt.split('T') : [existingAppt, ''];
+  reminderTarget={id:pid,firstName:firstName,email:email,apptDate:storedDate,apptTime:storedTime,dayStr:'',timeStr:''};
   document.getElementById('reminderApptSub').textContent='Sending reminder to '+firstName+' ('+email+'). Enter their upcoming appointment details.';
   const dateEl=document.getElementById('reminderApptDate');
   const timeEl=document.getElementById('reminderApptTime');
-  dateEl.value=(existingDate&&existingDate!=='undefined')?existingDate:'';
+  dateEl.value=storedDate||'';
+  timeEl.value=storedTime||'';
   timeEl.value='';
   hideErr('reminderApptErr');
   document.getElementById('reminderApptOverlay').classList.remove('hidden');
