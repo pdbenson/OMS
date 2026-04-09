@@ -622,7 +622,7 @@ async function doAdminLogin(){
   const btn=document.querySelector('#vAdminLogin .btn.bP');
   if(btn){btn.textContent='Signing in…';btn.disabled=true;}
   try{
-    const res=await fetch('/.netlify/functions/admin-login',{
+    const res=await fetch('/.netlify/functions/staff-login',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({email:em,password:pw})
