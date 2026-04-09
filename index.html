@@ -207,8 +207,8 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
   <div class="cw" style="display:flex;align-items:center;flex:1;max-width:480px">
     <div class="card" style="width:100%">
       <div class="chdl"><h2>Admin Login</h2><p>Restricted to authorized staff only.</p></div>
-      <div class="fd" style="margin-bottom:11px"><label class="lbl">Email</label><input type="email" class="inp" id="aEmail" onkeypress="if(event.key==='Enter')document.getElementById('aPwd').focus()"></div>
-      <div class="fd" style="margin-bottom:14px"><label class="lbl">Password</label><input type="password" class="inp" id="aPwd" onkeypress="if(event.key==='Enter')doAdminLogin()"></div>
+      <div class="fd" style="margin-bottom:11px"><label class="lbl">Email</label><input type="email" class="inp" id="aEmail" autocomplete="off" onkeypress="if(event.key==='Enter')document.getElementById('aPwd').focus()"></div>
+      <div class="fd" style="margin-bottom:14px"><label class="lbl">Password</label><input type="password" class="inp" id="aPwd" autocomplete="new-password" onkeypress="if(event.key==='Enter')doAdminLogin()"></div>
       <div id="adminErr" class="alert ae hidden"></div>
       <button class="btn bP" style="width:100%" onclick="doAdminLogin()">Login &#8594;</button>
     </div>
