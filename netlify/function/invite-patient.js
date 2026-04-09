@@ -75,7 +75,7 @@ exports.handler = async (event) => {
             <a href="${siteUrl}" style="display:inline-block;background:#3A7CA5;color:#ffffff;text-decoration:none;padding:13px 32px;border-radius:6px;font-weight:700;font-size:.95rem;letter-spacing:.02em">Begin My Preregistration &rarr;</a>
           </td></tr>
           <tr><td align="center" style="padding-top:8px">
-            <span style="font-size:.75rem;color:#6b7a8d">${siteUrl}</span>
+            <span style="font-size:.75rem;color:#6b7a8d">${siteUrl}?action=preregister</span>
           </td></tr>
         </table>
 
@@ -119,7 +119,7 @@ exports.handler = async (event) => {
 </body>
 </html>`;
 
-    const textBody = `Dear ${firstName},\n\nWelcome to Davis Center for Oral and Maxillofacial Surgery. We're looking forward to providing you with exceptional care.\n\nTo prepare for your upcoming visit, please complete your patient preregistration at: ${siteUrl}\n\nDuring preregistration you will complete:\n- Patient information & contact details\n- Insurance information\n- Health history\n- HIPAA Privacy Notice acknowledgment\n\nIf you have any questions, please call us at (801) 614-0999.\n\nWarm regards,\nDavis Center for Oral and Maxillofacial Surgery\nPaul Benson, DMD, MD\n890 W. Heritage Park Blvd., Suite 103 · Layton, Utah 84041\n(801) 614-0999 · info.davisoms@gmail.com`;
+    const textBody = `Dear ${firstName},\n\nWelcome to Davis Center for Oral and Maxillofacial Surgery. We're looking forward to providing you with exceptional care.\n\nTo prepare for your upcoming visit, please complete your patient preregistration at: ${siteUrl}?action=preregister\n\nDuring preregistration you will complete:\n- Patient information & contact details\n- Insurance information\n- Health history\n- HIPAA Privacy Notice acknowledgment\n\nIf you have any questions, please call us at (801) 614-0999.\n\nWarm regards,\nDavis Center for Oral and Maxillofacial Surgery\nPaul Benson, DMD, MD\n890 W. Heritage Park Blvd., Suite 103 · Layton, Utah 84041\n(801) 614-0999 · info.davisoms@gmail.com`;
 
     await transporter.sendMail({
       from: `"Davis Center for OMS" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
