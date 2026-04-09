@@ -12,10 +12,10 @@
 :root{--pri:#3A7CA5;--sec:#1F3A5F;--bg:#fff;--surf:#F4F6F8;--acc:#6FB3B8;--txt:#2E2E2E;--lt:#6b7a8d;--bdr:#d4dde6;--ok:#2e8b57;--err:#c0392b;--warn:#e67e22;--r:8px;--r2:14px;--sh:0 2px 14px rgba(31,58,95,.09);--shl:0 8px 36px rgba(31,58,95,.16);}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
-.view{display:none;flex-direction:column;flex:1;min-height:100vh}.view.active{display:flex}
-#vLand{background:var(--sec);position:relative;display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+.view{display:none;position:fixed;inset:0;flex-direction:column;overflow-y:auto}.view.active{display:flex}
+#vLand{background:var(--sec)}
 .lbg{position:absolute;inset:0;background:radial-gradient(ellipse at 18% 55%,rgba(58,124,165,.28) 0%,transparent 60%),radial-gradient(ellipse at 82% 18%,rgba(111,179,184,.22) 0%,transparent 50%),linear-gradient(155deg,#1F3A5F 0%,#0d1e38 100%)}
-.lcont{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;min-height:0;padding:40px 24px 20px;text-align:center;overflow:hidden}
+.lcont{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;min-height:0;padding:40px 24px 20px;text-align:center}
 .lembl{width:78px;height:78px;background:rgba(58,124,165,.25);border:2px solid rgba(111,179,184,.45);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;font-size:2rem}
 .ltitle{font-family:'Libre Baskerville',serif;font-size:2rem;font-weight:700;color:#fff;line-height:1.2;max-width:530px;margin:0 auto}
 .ldiv{width:56px;height:2px;background:var(--acc);margin:18px auto}
@@ -25,9 +25,9 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
 .btnPL:hover{background:#2d6a8f;transform:translateY(-1px)}
 .btnSL{background:transparent;color:#fff;border:2px solid rgba(111,179,184,.6);padding:13px 32px;border-radius:var(--r);font-family:'Nunito',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s}
 .btnSL:hover{border-color:var(--acc);background:rgba(111,179,184,.1)}
-.adminBtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.7);padding:6px 16px;border-radius:var(--r);font-family:'Nunito',sans-serif;font-size:.78rem;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.adminBtn{position:absolute;right:16px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.65);padding:5px 14px;border-radius:var(--r);font-family:'Nunito',sans-serif;font-size:.76rem;cursor:pointer;transition:all .2s}
 .adminBtn:hover{background:rgba(255,255,255,.22);color:#fff}
-.lfooter{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;background:rgba(0,0,0,.32);color:rgba(255,255,255,.6);font-size:.75rem;line-height:1.5;z-index:2;position:relative}
+.lfooter{flex-shrink:0;position:relative;text-align:center;padding:13px 80px;background:rgba(0,0,0,.32);color:rgba(255,255,255,.6);font-size:.75rem;line-height:1.7;z-index:2}
 .lfooter a,.pgft a{color:var(--acc);text-decoration:none}
 .phdr{background:var(--sec);color:#fff;text-align:center;padding:17px 24px;position:relative;flex-shrink:0}
 .phdr .logo{font-family:'Libre Baskerville',serif;font-size:.98rem;font-weight:700;letter-spacing:.02em}
@@ -263,15 +263,7 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
       <button class="btnSL" onclick="gotoEmail('view')">View Forms</button>
     </div>
   </div>
-  <div class="lfooter">
-    <div class="lfooter-info">
-      <strong style="color:rgba(255,255,255,.8)">Davis Center for Oral and Maxillofacial Surgery</strong><br>
-      890 W Heritage Park Blvd, Suite 103 &middot; Layton, Utah 84041<br>
-      (801) 614-0999 &middot; <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a>
-      <div class="footer-nav" style="margin-top:4px"><a href="/hipaa-compliance.html" target="_blank">HIPAA Compliance</a><span class="footer-sep">|</span><a href="/terms-privacy.html" target="_blank">Terms &amp; Privacy</a></div>
-    </div>
-    <button type="button" class="adminBtn" onclick="showV('vAdminLogin')">Admin</button>
-  </div>
+  <div class="lfooter"><strong>Davis Center for Oral and Maxillofacial Surgery</strong><br>890 W Heritage Park Blvd, Suite 103 &middot; Layton, Utah 84041<br>(801) 614-0999 &middot; <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a><div class="footer-nav"><a href="/hipaa-compliance.html" target="_blank">HIPAA Compliance</a><span class="footer-sep">|</span><a href="/terms-privacy.html" target="_blank">Terms &amp; Privacy</a></div><button type="button" class="adminBtn" onclick="showV('vAdminLogin')">Admin</button></div>
 </div>
 
 <!-- EMAIL ENTRY -->
