@@ -1002,11 +1002,22 @@ function expireAdminSession(){
 }
 
 async function renewAdminSession(){
-  // Re-prompt for password to get a fresh token
-  document.getElementById('aEmail').value=document.getElementById('adminTimeoutBar').dataset.email||'';
-  showV('vAdminLogin');
-  clearInterval(adminCountdownTimer);
-  adminToken=null;
+  try{
+    const res=await apiPost('renew-session',{},adminToken);
+    adminToken=res.token; adminTokenExpiry=res.expiresAt;
+    // Restart countdown with fresh 15 minutes
+    clearInterval(adminCountdownTimer);
+    startAdminTimeout();
+    document.getElementById('adminTimeoutCount').style.color='';
+    toast('Session renewed ✓ — 15 minutes added');
+  }catch(e){
+    // Token expired and can't be renewed — force re-login
+    adminToken=null; adminTokenExpiry=null;
+    clearInterval(adminCountdownTimer);
+    document.getElementById('adminTimeoutBar').classList.add('hidden');
+    toast('Session expired — please log in again.',4000);
+    showV('vAdminLogin');
+  }
 }
 
 function adminLogout(){
@@ -1398,7 +1409,22 @@ function expireStaffSession(){
   toast('Session expired — please log in again.',4000);
   showV('vAdminLogin');
 }
-function renewStaffSession(){document.getElementById('aEmail').value=staffInfo.email;showV('vAdminLogin');}
+async function renewStaffSession(){
+  try{
+    const res=await apiPost('renew-session',{},staffToken);
+    staffToken=res.token; staffTokenExpiry=res.expiresAt;
+    clearInterval(staffCountdownTimer);
+    startStaffTimeout();
+    document.getElementById('staffTimeoutCount').style.color='';
+    toast('Session renewed ✓ — 15 minutes added');
+  }catch(e){
+    staffToken=null; staffTokenExpiry=null;
+    clearInterval(staffCountdownTimer);
+    document.getElementById('staffTimeoutBar').classList.add('hidden');
+    toast('Session expired — please log in again.',4000);
+    showV('vAdminLogin');
+  }
+}
 function staffLogout(){
   staffToken=null; staffTokenExpiry=null;
   clearInterval(staffCountdownTimer);
