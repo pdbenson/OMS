@@ -13,7 +13,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
 .view{display:none;flex-direction:column;flex:1;min-height:100vh}.view.active{display:flex}
-#vLand{background:var(--sec);position:relative;overflow:hidden}
+#vLand{background:var(--sec);position:relative;overflow:hidden;display:flex;flex-direction:column}
 .lbg{position:absolute;inset:0;background:radial-gradient(ellipse at 18% 55%,rgba(58,124,165,.28) 0%,transparent 60%),radial-gradient(ellipse at 82% 18%,rgba(111,179,184,.22) 0%,transparent 50%),linear-gradient(155deg,#1F3A5F 0%,#0d1e38 100%)}
 .lcont{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:60px 24px 100px;text-align:center}
 .lembl{width:78px;height:78px;background:rgba(58,124,165,.25);border:2px solid rgba(111,179,184,.45);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;font-size:2rem}
@@ -27,7 +27,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
 .btnSL:hover{border-color:var(--acc);background:rgba(111,179,184,.1)}
 .adminBtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);padding:5px 14px;border-radius:var(--r);font-family:'Nunito',sans-serif;font-size:.75rem;cursor:pointer;transition:all .2s;display:inline-block;margin-top:8px}
 .adminBtn:hover{background:rgba(255,255,255,.2);color:#fff}
-.lfooter{position:absolute;bottom:0;left:0;right:0;text-align:center;padding:15px 24px;background:rgba(0,0,0,.28);color:rgba(255,255,255,.6);font-size:.78rem;line-height:1.8;z-index:2}
+.lfooter{margin-top:auto;text-align:center;padding:15px 24px;background:rgba(0,0,0,.28);color:rgba(255,255,255,.6);font-size:.78rem;line-height:1.8;z-index:2;position:relative}
 .lfooter a,.pgft a{color:var(--acc);text-decoration:none}
 .phdr{background:var(--sec);color:#fff;text-align:center;padding:17px 24px;position:relative;flex-shrink:0}
 .phdr .logo{font-family:'Libre Baskerville',serif;font-size:.98rem;font-weight:700;letter-spacing:.02em}
