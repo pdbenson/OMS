@@ -65,7 +65,8 @@ function requireStaff(event) {
   const token = getBearerToken(event);
   if (!token) return null;
   const decoded = verifyToken(token);
-  if (!decoded || (decoded.role !== 'staff' && decoded.role !== 'admin')) return null;
+  const STAFF_ROLES = ['admin', 'provider', 'staff'];
+  if (!decoded || !STAFF_ROLES.includes(decoded.role)) return null;
   return decoded; // { role, staffId?, email, name? }
 }
 
@@ -73,7 +74,8 @@ function requireAdmin(event) {
   const token = getBearerToken(event);
   if (!token) return false;
   const decoded = verifyToken(token);
-  return decoded && decoded.role === 'admin';
+  const ADMIN_ROLES = ['admin', 'provider'];
+  return decoded && ADMIN_ROLES.includes(decoded.role);
 }
 
 // ── AUDIT LOG ──────────────────────────────────────────────

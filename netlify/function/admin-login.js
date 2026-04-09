@@ -78,6 +78,7 @@ exports.handler = async (event) => {
     }
 
     // Issue 15-minute JWT
+    const expiresAt = Date.now() + 15 * 60 * 1000;
     const token = jwt.sign(
       {
         staffId: staffMember.id,
@@ -97,6 +98,7 @@ exports.handler = async (event) => {
       headers: CORS,
       body: JSON.stringify({
         token,
+        expiresAt,
         role: staffMember.role,
         firstName: staffMember.first_name,
         lastName: staffMember.last_name,
