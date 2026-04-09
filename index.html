@@ -501,8 +501,11 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
     <button onclick="renewStaffSession()">Renew Session</button>
   </div>
   <div style="padding:18px 16px;flex:1;overflow:auto">
-    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
       <span style="font-size:.85rem;color:var(--lt)" id="staffPtCount"></span>
+      <button class="btn bG" style="display:flex;align-items:center;gap:7px" onclick="openNewPatientModal()">
+        <span style="font-size:1.1rem;font-weight:400">&#xFF0B;</span> New Patient Invite
+      </button>
     </div>
     <div class="tblwrap">
       <table class="ptbl">
@@ -1032,6 +1035,20 @@ function checkAdminAuth(){
   if(!adminToken||Date.now()>adminTokenExpiry){expireAdminSession();return false;}
   return true;
 }
+function checkAnyAuth(){
+  // Returns true if admin OR staff session is valid
+  if(adminToken&&Date.now()<adminTokenExpiry)return true;
+  if(staffToken&&Date.now()<staffTokenExpiry)return true;
+  // Neither valid — expire whichever was last used
+  if(adminToken)expireAdminSession(); else expireStaffSession();
+  return false;
+}
+function activeToken(){
+  // Returns the current valid token (admin takes priority)
+  if(adminToken&&Date.now()<adminTokenExpiry)return adminToken;
+  if(staffToken&&Date.now()<staffTokenExpiry)return staffToken;
+  return null;
+}
 
 // ── ADMIN DASHBOARD ───────────────────────────────────────────────────
 function buildPatientRow(p,done,isDraft,ed,ca){
@@ -1254,7 +1271,7 @@ function previewReminderEmail(){
   document.getElementById('reminderPreviewOverlay').classList.remove('hidden');
 }
 async function sendReminderEmail(){
-  if(!checkAdminAuth())return;
+  if(!checkAnyAuth())return;
   const btn=document.getElementById('reminderSendBtn');
   btn.disabled=true;btn.textContent='Sending...';
   hideErr('reminderSendErr');
@@ -1263,7 +1280,7 @@ async function sendReminderEmail(){
       patientId:reminderTarget.id,email:reminderTarget.email,
       firstName:reminderTarget.firstName,apptDate:reminderTarget.apptDate,
       apptTime:reminderTarget.apptTime,dayStr:reminderTarget.dayStr,timeStr:reminderTarget.timeStr
-    },adminToken);
+    },activeToken());
     document.getElementById('reminderSendOk').textContent='Reminder sent successfully to '+reminderTarget.email;
     document.getElementById('reminderSendOk').classList.remove('hidden');
     btn.textContent='\u2713 Sent';
@@ -1278,7 +1295,7 @@ async function sendReminderEmail(){
 
 // ── NEW PATIENT INVITE ────────────────────────────────────────────────
 function openNewPatientModal(){
-  if(!checkAdminAuth())return;
+  if(!checkAnyAuth())return;
   document.getElementById('np_first').value='';
   document.getElementById('np_last').value='';
   document.getElementById('np_email').value='';
@@ -1307,7 +1324,7 @@ async function sendNewPatientInvite(){
   const btn=document.getElementById('npSendBtn');
   btn.disabled=true; btn.textContent='Sending...';
   try{
-    await apiPost('invite-patient',{firstName,lastName,email,phone},adminToken);
+    await apiPost('invite-patient',{firstName,lastName,email,phone},activeToken());
     btn.textContent='✓ Sent';
     document.getElementById('npOk').textContent='Invitation sent successfully to '+email;
     document.getElementById('npOk').classList.remove('hidden');
@@ -1465,6 +1482,7 @@ async function loadStaffDash(){
         +'<td style="white-space:nowrap">'
         +'<button class="btn bP" style="padding:5px 10px;font-size:.75rem" onclick="staffViewPt(\''+p.id+'\')">View</button>'
         +' <button class="btn bA" style="padding:5px 10px;font-size:.75rem;margin-left:3px" onclick="staffConsentModal(\''+p.id+'\')">Forms'+(ca?' ('+ca+')':'')+'</button>'
+        +' <button class="btn" style="padding:5px 10px;font-size:.75rem;background:#e67e22;color:#fff;margin-left:3px" onclick="openReminderModal(\''+p.id+'\')">&#x1F514; Remind</button>'
         +'</td></tr>';
     }).join('');
   }catch(e){setLoading(false);toast('Could not load patients: '+e.message);}
