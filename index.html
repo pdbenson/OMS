@@ -159,6 +159,19 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
       <div class="fd"><label class="lbl">First Name <span class="req">*</span></label><input class="inp" id="si_first" placeholder="First name"></div>
       <div class="fd"><label class="lbl">Last Name <span class="req">*</span></label><input class="inp" id="si_last" placeholder="Last name"></div>
       <div class="fd full"><label class="lbl">Email Address <span class="req">*</span></label><input type="email" class="inp" id="si_email" placeholder="staff@example.com"></div>
+      <div class="fd full">
+        <label class="lbl">Role <span class="req">*</span></label>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <label style="flex:1;display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surf);border-radius:var(--r);cursor:pointer;border:2px solid transparent" id="roleStaffLabel">
+            <input type="radio" name="si_role" id="si_role_staff" value="staff" checked onchange="updateRoleLabel()" style="accent-color:var(--pri);width:15px;height:15px">
+            <div><div style="font-weight:700;font-size:.88rem;color:var(--sec)">Staff</div><div style="font-size:.74rem;color:var(--lt)">View patients, assign &amp; witness consent forms</div></div>
+          </label>
+          <label style="flex:1;display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surf);border-radius:var(--r);cursor:pointer;border:2px solid transparent" id="roleProviderLabel">
+            <input type="radio" name="si_role" id="si_role_provider" value="provider" onchange="updateRoleLabel()" style="accent-color:var(--pri);width:15px;height:15px">
+            <div><div style="font-weight:700;font-size:.88rem;color:var(--sec)">Provider</div><div style="font-size:.74rem;color:var(--lt)">Full access + sign as doctor on consent forms</div></div>
+          </label>
+        </div>
+      </div>
     </div>
     <div id="siErr" class="alert ae hidden"></div>
     <div id="siOk" class="alert ao hidden"></div>
@@ -444,7 +457,7 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
       </div>
       <div id="staffListContainer">
         <table class="ptbl" id="staffTable">
-          <thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Invited</th><th>Last Login</th><th>Action</th></tr></thead>
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Invited</th><th>Last Login</th><th>Action</th></tr></thead>
           <tbody id="staffTableBody"></tbody>
         </table>
         <div id="noStaff" class="alert ai hidden" style="margin-top:14px">No staff members added yet.</div>
@@ -1254,13 +1267,25 @@ async function tryStaffLogin(email, password){
   try{
     const res=await apiPost('staff-login',{email,password});
     staffToken=res.token; staffTokenExpiry=res.expiresAt;
-    staffInfo={name:res.name, email:res.email};
-    document.getElementById('staffName').textContent=res.name;
+    staffInfo={name:res.name, email:res.email, role:res.role};
     document.getElementById('aPwd').value='';
     hideErr('adminErr');
     startStaffTimeout();
-    await loadStaffDash();
-    showV('vStaffDash');
+    if(res.role==='provider'){
+      // Provider gets full admin dashboard
+      adminToken=res.token; adminTokenExpiry=res.expiresAt;
+      staffInfo.isProvider=true;
+      startAdminTimeout();
+      await loadDash();
+      showV('vAdminDash');
+      // Show provider badge in admin header
+      document.getElementById('ptCount').insertAdjacentHTML('afterend',
+        ' <span style="background:rgba(111,179,184,.3);color:#b8e0e3;padding:2px 9px;border-radius:10px;font-size:.72rem;margin-left:6px">Provider</span>');
+    } else {
+      document.getElementById('staffName').textContent=res.name;
+      await loadStaffDash();
+      showV('vStaffDash');
+    }
   }catch(e){
     // Both admin and staff login failed — show generic error
     setLoading(false);
@@ -1380,11 +1405,20 @@ function switchAdminTab(tab){
 }
 
 // ── STAFF MANAGEMENT ─────────────────────────────────────────────────
+
+function updateRoleLabel(){
+  const isProvider=document.getElementById('si_role_provider').checked;
+  document.getElementById('roleStaffLabel').style.borderColor=isProvider?'transparent':'var(--pri)';
+  document.getElementById('roleProviderLabel').style.borderColor=isProvider?'var(--pri)':'transparent';
+}
+
 function openAddStaffModal(){
   if(!checkAdminAuth())return;
   document.getElementById('si_first').value='';
   document.getElementById('si_last').value='';
   document.getElementById('si_email').value='';
+  document.getElementById('si_role_staff').checked=true;
+  updateRoleLabel();
   document.getElementById('siErr').classList.add('hidden');
   document.getElementById('siOk').classList.add('hidden');
   document.getElementById('siSendBtn').disabled=false;
@@ -1404,8 +1438,9 @@ async function sendStaffInvite(){
   if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showErr('siErr','A valid email is required.');return;}
   const btn=document.getElementById('siSendBtn');
   btn.disabled=true; btn.textContent='Sending...';
+  const role=document.getElementById('si_role_provider').checked?'provider':'staff';
   try{
-    const res=await apiPost('staff-invite',{firstName,lastName,email},adminToken);
+    const res=await apiPost('staff-invite',{firstName,lastName,email,role},adminToken);
     btn.textContent='\u2713 Sent';
     document.getElementById('siOk').textContent='Invitation sent to '+email+(res.sent?'':' (SMTP not configured — share link manually: '+res.acceptUrl+')');
     document.getElementById('siOk').classList.remove('hidden');
@@ -1424,9 +1459,13 @@ async function loadStaffList(){
     document.getElementById('staffTable').classList.toggle('hidden',staff.length===0);
     document.getElementById('staffTableBody').innerHTML=staff.map(s=>{
       const status=s.accepted_at?'<span class="bdg" style="background:#d5f5e3;color:#196f3d">Active</span>':'<span class="bdg" style="background:#fff3cd;color:#856404">Invited</span>';
+      const roleLabel=s.role==='provider'
+        ?'<span class="bdg" style="background:#eaf4fc;color:#1a5276">Provider</span>'
+        :'<span class="bdg" style="background:#f4f6f8;color:#6b7a8d">Staff</span>';
       return'<tr>'
         +'<td><strong>'+s.first_name+' '+s.last_name+'</strong></td>'
         +'<td style="font-size:.82rem;color:var(--lt)">'+s.email+'</td>'
+        +'<td>'+roleLabel+'</td>'
         +'<td>'+status+'</td>'
         +'<td style="font-size:.78rem;color:var(--lt)">'+(s.invited_at?new Date(s.invited_at).toLocaleDateString():'&mdash;')+'</td>'
         +'<td style="font-size:.78rem;color:var(--lt)">'+(s.accepted_at?new Date(s.accepted_at).toLocaleDateString():'Never')+'</td>'
