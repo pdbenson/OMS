@@ -151,6 +151,37 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
 <div class="overlay hidden" id="consentOverlay"><div class="mbox"><h3>Assign Consent Forms</h3><p id="consentModalSub"></p><div class="clist" id="consentCheckList"></div><div class="modal-btns"><button class="btn bS" onclick="closeConsentModal()">Cancel</button><button class="btn bP" onclick="saveConsentAssignment()">Save Assignment</button></div></div></div>
 <div class="overlay hidden" id="editionOverlay"><div class="mbox"><h3>Forms Already Completed</h3><p id="editionModalMsg"></p><div class="modal-btns"><button class="btn bS" onclick="closeEditionModal()">Cancel</button><button class="btn bD" onclick="confirmNewEdition()">Create New Edition</button></div></div></div>
 <div class="toast" id="toast"></div>
+<div class="overlay hidden" id="addStaffOverlay">
+  <div class="mbox" style="max-width:480px">
+    <h3>Add Staff Member</h3>
+    <p>Enter their details. They will receive an email invitation to set their password and access the staff portal.</p>
+    <div class="fg" style="margin-bottom:12px">
+      <div class="fd"><label class="lbl">First Name <span class="req">*</span></label><input class="inp" id="si_first" placeholder="First name"></div>
+      <div class="fd"><label class="lbl">Last Name <span class="req">*</span></label><input class="inp" id="si_last" placeholder="Last name"></div>
+      <div class="fd full"><label class="lbl">Email Address <span class="req">*</span></label><input type="email" class="inp" id="si_email" placeholder="staff@example.com"></div>
+    </div>
+    <div id="siErr" class="alert ae hidden"></div>
+    <div id="siOk" class="alert ao hidden"></div>
+    <div class="modal-btns">
+      <button class="btn bS" onclick="closeAddStaffModal()">Cancel</button>
+      <button class="btn bP" id="siSendBtn" onclick="sendStaffInvite()">&#x2709; Send Invitation</button>
+    </div>
+  </div>
+</div>
+
+<!-- Print Sections Modal -->
+<div class="overlay hidden" id="printSectionsOverlay">
+  <div class="mbox" style="max-width:500px">
+    <h3>Print / Export Forms</h3>
+    <p id="printSectionsSub">Select which sections to print. Each opens as a separate PDF.</p>
+    <div id="printSectionsList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px"></div>
+    <div class="modal-btns">
+      <button class="btn bS" onclick="document.getElementById('printSectionsOverlay').classList.add('hidden')">Close</button>
+    </div>
+  </div>
+</div>
+
+
 <div class="overlay hidden" id="newPatientOverlay">
   <div class="mbox" style="max-width:520px">
     <h3>Invite New Patient</h3>
@@ -330,13 +361,29 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
       <div style="margin-top:18px;display:flex;gap:9px;flex-wrap:wrap">
         <button class="btn bP hidden" id="btnContinue" onclick="continueIntake()">Continue Intake &#8594;</button>
         <button class="btn bA hidden" id="btnEdit" onclick="editForms()">Edit Forms</button>
-        <button class="btn bS hidden" id="btnPrintAll" onclick="printForms()">&#x1F5A8; Print All Forms</button>
+        <button class="btn bS hidden" id="btnPrintAll" onclick="openPrintModal(patientData)">&#x1F5A8; Print Forms</button>
         <button class="btn bS hidden" id="btnPrintHH" onclick="printHHPdf()">&#x1F4C4; Health History PDF</button>
         <button class="btn bS hidden" id="btnPrintHIPAA" onclick="printHIPAAPdf()">&#x1F4C4; HIPAA Notice PDF</button>
       </div>
     </div>
   </div>
   <div class="pgft">Davis Center for Oral and Maxillofacial Surgery &middot; 890 W Heritage Park Blvd, Suite 103 &middot; Layton, Utah 84041<br>(801) 614-0999 &middot; <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a><div class="pgft-nav"><a href="/hipaa-compliance.html" target="_blank">HIPAA Compliance</a><span class="pgft-sep">|</span><a href="/terms-privacy.html" target="_blank">Terms &amp; Privacy</a></div></div>
+</div>
+
+<!-- STAFF ACCEPT INVITATION -->
+<div id="vStaffAccept" class="view">
+  <div class="phdr"><div class="logo">Staff Portal Invitation</div><div class="sub">Davis Center for Oral and Maxillofacial Surgery</div></div>
+  <div class="cw" style="display:flex;align-items:center;flex:1;max-width:480px">
+    <div class="card" style="width:100%">
+      <div class="chdl"><h2 id="staffAcceptTitle">Set Your Password</h2><p id="staffAcceptSub">Welcome! Create a password to activate your staff account.</p></div>
+      <div class="fd" style="margin-bottom:11px"><label class="lbl">New Password <span class="req">*</span></label><input type="password" class="inp" id="staffPwd1" placeholder="At least 8 characters" autocomplete="new-password"></div>
+      <div class="fd" style="margin-bottom:14px"><label class="lbl">Confirm Password <span class="req">*</span></label><input type="password" class="inp" id="staffPwd2" placeholder="Repeat password" autocomplete="new-password" onkeypress="if(event.key==='Enter')doStaffAccept()"></div>
+      <div id="staffAcceptErr" class="alert ae hidden"></div>
+      <div id="staffAcceptOk" class="alert ao hidden"></div>
+      <button class="btn bP" style="width:100%" id="staffAcceptBtn" onclick="doStaffAccept()">Activate My Account &#8594;</button>
+    </div>
+  </div>
+  <div class="pgft">Davis Center for Oral and Maxillofacial Surgery &middot; 890 W Heritage Park Blvd, Suite 103 &middot; Layton, Utah 84041<br>(801) 614-0999 &middot; <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a></div>
 </div>
 
 <!-- ADMIN LOGIN -->
@@ -365,6 +412,14 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
     <button onclick="renewAdminSession()">Renew Session</button>
   </div>
   <div style="padding:18px 16px;flex:1;overflow:auto">
+    <!-- Admin Tabs -->
+    <div style="display:flex;gap:0;border-bottom:2px solid var(--bdr);margin-bottom:18px">
+      <button id="tabPatients" class="btn" style="border-radius:var(--r) var(--r) 0 0;border-bottom:3px solid var(--pri);background:var(--surf);color:var(--pri);padding:8px 20px;font-size:.85rem" onclick="switchAdminTab('patients')">Patients</button>
+      <button id="tabStaff" class="btn" style="border-radius:var(--r) var(--r) 0 0;border-bottom:3px solid transparent;background:transparent;color:var(--lt);padding:8px 20px;font-size:.85rem" onclick="switchAdminTab('staff')">Staff Management</button>
+    </div>
+
+    <!-- Patients Panel -->
+    <div id="adminPatientsPanel">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
       <div style="font-size:.9rem;color:var(--lt)">Patient preregistration records</div>
       <button class="btn bG" style="display:flex;align-items:center;gap:7px" onclick="openNewPatientModal()">
@@ -378,7 +433,24 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
       </table>
     </div>
     <div id="noPatients" class="alert ai hidden" style="margin-top:18px">No patient records found yet.</div>
+    </div><!-- end tblwrap -->
+    </div><!-- end adminPatientsPanel -->
+
+    <!-- Staff Panel -->
+    <div id="adminStaffPanel" class="hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-size:.9rem;color:var(--lt)">Manage staff who can access the portal</div>
+        <button class="btn bP" style="display:flex;align-items:center;gap:7px" onclick="openAddStaffModal()">&#xFF0B; Add Staff Member</button>
+      </div>
+      <div id="staffListContainer">
+        <table class="ptbl" id="staffTable">
+          <thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Invited</th><th>Last Login</th><th>Action</th></tr></thead>
+          <tbody id="staffTableBody"></tbody>
+        </table>
+        <div id="noStaff" class="alert ai hidden" style="margin-top:14px">No staff members added yet.</div>
+      </div>
     </div>
+
   </div>
   <div class="pgft">Davis Center for Oral and Maxillofacial Surgery &middot; 890 W Heritage Park Blvd, Suite 103 &middot; Layton, Utah 84041<br>(801) 614-0999 &middot; <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a><div class="pgft-nav"><a href="/hipaa-compliance.html" target="_blank">HIPAA Compliance</a><span class="pgft-sep">|</span><a href="/terms-privacy.html" target="_blank">Terms &amp; Privacy</a></div></div>
 
@@ -389,12 +461,53 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn bA" style="padding:7px 12px;font-size:.78rem" onclick="printCurrentPtHH()">&#x1F4C4; Health History</button>
       <button class="btn bA" style="padding:7px 12px;font-size:.78rem" onclick="printCurrentPtHIPAA()">&#x1F4C4; HIPAA</button>
-      <button class="btn bS" style="padding:7px 12px;font-size:.78rem" onclick="printCurrentPt()">&#x1F5A8; Print All</button>
+      <button class="btn bS" style="padding:7px 12px;font-size:.78rem" onclick="openPrintModal(adminPtDetail)">&#x1F5A8; Print Forms</button>
       <button class="btn bS" style="padding:7px 12px;font-size:.78rem" onclick="showV('vAdminDash');loadDash()">&#8592; Back</button>
     </div>
   </div>
   <div id="aptDetail" style="padding:18px 16px;flex:1;overflow:auto;max-width:900px;margin:0 auto;width:100%"></div>
   <div class="pgft">Davis Center for Oral and Maxillofacial Surgery &middot; 890 W Heritage Park Blvd, Suite 103 &middot; Layton, Utah 84041<br>(801) 614-0999 &middot; <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a><div class="pgft-nav"><a href="/hipaa-compliance.html" target="_blank">HIPAA Compliance</a><span class="pgft-sep">|</span><a href="/terms-privacy.html" target="_blank">Terms &amp; Privacy</a></div></div>
+</div>
+
+<!-- STAFF DASHBOARD -->
+<div id="vStaffDash" class="view">
+  <div class="ahdr">
+    <div><h2>Patient Dashboard</h2><div style="font-size:.75rem;opacity:.65;margin-top:2px" id="staffDashSub">Davis Center for Oral and Maxillofacial Surgery</div></div>
+    <div style="display:flex;gap:9px;align-items:center">
+      <span style="font-size:.78rem;opacity:.65" id="staffName"></span>
+      <span style="font-size:.72rem;background:rgba(111,179,184,.3);color:#b8e0e3;padding:2px 9px;border-radius:10px">Staff</span>
+      <button class="btn bS" style="padding:7px 13px;font-size:.8rem" onclick="staffLogout()">Logout</button>
+    </div>
+  </div>
+  <div id="staffTimeoutBar" class="timeout-bar hidden">
+    <span>&#9888; Session expires in <strong id="staffTimeoutCount">15:00</strong></span>
+    <button onclick="renewStaffSession()">Renew Session</button>
+  </div>
+  <div style="padding:18px 16px;flex:1;overflow:auto">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+      <span style="font-size:.85rem;color:var(--lt)" id="staffPtCount"></span>
+    </div>
+    <div class="tblwrap">
+      <table class="ptbl">
+        <thead><tr><th>First Name</th><th>Last Name</th><th>Email</th><th>Forms Completed</th><th>Date Completed</th><th>Last Activity</th><th>Ed.</th><th>Actions</th></tr></thead>
+        <tbody id="staffPtblBody"></tbody>
+      </table>
+    </div>
+    <div id="staffNoPatients" class="alert ai hidden" style="margin-top:18px">No patient records found yet.</div>
+  </div>
+  <div class="pgft">Davis Center for Oral and Maxillofacial Surgery &middot; 890 W Heritage Park Blvd, Suite 103 &middot; Layton, Utah 84041<br>(801) 614-0999 &middot; <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a></div>
+</div>
+
+<!-- STAFF PATIENT VIEW -->
+<div id="vStaffPt" class="view">
+  <div class="ahdr">
+    <div><h2 id="staffPtName">Patient Forms</h2><div style="font-size:.75rem;opacity:.65;margin-top:2px" id="staffPtEmail"></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn bS" style="padding:7px 12px;font-size:.78rem" onclick="showV('vStaffDash');loadStaffDash()">&#8592; Back</button>
+    </div>
+  </div>
+  <div id="staffPtDetail" style="padding:18px 16px;flex:1;overflow:auto;max-width:900px;margin:0 auto;width:100%"></div>
+  <div class="pgft">Davis Center for Oral and Maxillofacial Surgery &middot; 890 W Heritage Park Blvd, Suite 103 &middot; Layton, Utah 84041<br>(801) 614-0999 &middot; <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a></div>
 </div>
 
 <script>
@@ -414,7 +527,7 @@ let mode='intake', curEmail='', curStep=1, ynMap={}, sigPads={};
 let patientToken=null, patientId=null, patientData=null;
 let adminToken=null, adminTokenExpiry=null, adminTimeoutTimer=null, adminCountdownTimer=null;
 let adminPtId='', adminPtEmail='', adminPtDetail=null;
-let consentTargetId='';
+let consentTargetId='', consentTargetToken=null;
 
 // ── API HELPERS ────────────────────────────────────────────────────────
 const API = '/.netlify/functions/';
@@ -1091,6 +1204,338 @@ async function sendNewPatientInvite(){
   }
 }
 
+
+// ── STAFF STATE ───────────────────────────────────────────────────────
+let staffToken=null, staffTokenExpiry=null, staffCountdownTimer=null;
+let staffInfo={name:'',email:''};
+let _staffPatientCache={};
+
+// ── INVITE TOKEN CHECK ON PAGE LOAD ───────────────────────────────────
+(function checkInviteToken(){
+  const params=new URLSearchParams(window.location.search);
+  const token=params.get('staff_invite');
+  if(token){
+    // Clean URL
+    window.history.replaceState({},'',window.location.pathname);
+    // Show accept screen
+    document.getElementById('staffAcceptTitle').textContent='Activate Your Staff Account';
+    document.getElementById('staffAcceptSub').textContent='Welcome! Please create a password to activate your account.';
+    document.getElementById('staffAcceptBtn').dataset.token=token;
+    // Wait for DOM
+    setTimeout(()=>showV('vStaffAccept'),100);
+  }
+})();
+
+// ── STAFF ACCEPT INVITATION ───────────────────────────────────────────
+async function doStaffAccept(){
+  const token=document.getElementById('staffAcceptBtn').dataset.token||'';
+  const pwd1=document.getElementById('staffPwd1').value;
+  const pwd2=document.getElementById('staffPwd2').value;
+  hideErr('staffAcceptErr');
+  if(!pwd1||pwd1.length<8){showErr('staffAcceptErr','Password must be at least 8 characters.');return;}
+  if(pwd1!==pwd2){showErr('staffAcceptErr','Passwords do not match.');return;}
+  const btn=document.getElementById('staffAcceptBtn');
+  btn.disabled=true; btn.textContent='Activating...';
+  try{
+    const res=await apiPost('staff-accept',{token,password:pwd1});
+    document.getElementById('staffAcceptOk').textContent='Account activated! You can now log in using the Admin button.';
+    document.getElementById('staffAcceptOk').classList.remove('hidden');
+    btn.textContent='\u2713 Done';
+    setTimeout(()=>showV('vAdminLogin'),2500);
+  }catch(e){
+    btn.disabled=false; btn.textContent='Activate My Account \u2192';
+    showErr('staffAcceptErr',e.message||'Activation failed. Please try again.');
+  }
+}
+
+// ── STAFF LOGIN ───────────────────────────────────────────────────────
+// Called from doAdminLogin after admin login fails — try staff login
+async function tryStaffLogin(email, password){
+  try{
+    const res=await apiPost('staff-login',{email,password});
+    staffToken=res.token; staffTokenExpiry=res.expiresAt;
+    staffInfo={name:res.name, email:res.email};
+    document.getElementById('staffName').textContent=res.name;
+    document.getElementById('aPwd').value='';
+    hideErr('adminErr');
+    startStaffTimeout();
+    await loadStaffDash();
+    showV('vStaffDash');
+  }catch(e){
+    // Both admin and staff login failed — show generic error
+    setLoading(false);
+    showErr('adminErr','Invalid email or password.');
+  }
+}
+
+function startStaffTimeout(){
+  clearInterval(staffCountdownTimer);
+  document.getElementById('staffTimeoutBar').classList.remove('hidden');
+  staffCountdownTimer=setInterval(()=>{
+    const remaining=Math.max(0,staffTokenExpiry-Date.now());
+    const m=Math.floor(remaining/60000),s=Math.floor((remaining%60000)/1000);
+    document.getElementById('staffTimeoutCount').textContent=m+':'+(s<10?'0':'')+s;
+    if(remaining<=120000)document.getElementById('staffTimeoutCount').style.color='var(--err)';
+    if(remaining<=0){clearInterval(staffCountdownTimer);expireStaffSession();}
+  },1000);
+}
+function expireStaffSession(){
+  staffToken=null; staffTokenExpiry=null;
+  clearInterval(staffCountdownTimer);
+  document.getElementById('staffTimeoutBar').classList.add('hidden');
+  toast('Session expired — please log in again.',4000);
+  showV('vAdminLogin');
+}
+function renewStaffSession(){document.getElementById('aEmail').value=staffInfo.email;showV('vAdminLogin');}
+function staffLogout(){
+  staffToken=null; staffTokenExpiry=null;
+  clearInterval(staffCountdownTimer);
+  document.getElementById('staffTimeoutBar').classList.add('hidden');
+  showV('vLand');
+}
+function checkStaffAuth(){
+  if(!staffToken||Date.now()>staffTokenExpiry){expireStaffSession();return false;}
+  return true;
+}
+
+// ── STAFF DASHBOARD ───────────────────────────────────────────────────
+async function loadStaffDash(){
+  if(!checkStaffAuth())return;
+  setLoading(true,'Loading patients...');
+  try{
+    const {patients}=await apiGet('admin-patients',{},staffToken);
+    setLoading(false);
+    document.getElementById('staffPtCount').textContent=patients.length+' patient'+(patients.length!==1?'s':'');
+    document.getElementById('staffNoPatients').classList.toggle('hidden',patients.length>0);
+    const LBLS={pi:'Patient Info',ins:'Insurance',hh:'Health History',hipaa:'HIPAA'};
+    document.getElementById('staffPtblBody').innerHTML=patients.map(p=>{
+      _staffPatientCache[p.id]=p;
+      const done=Object.entries(p.forms||{}).filter(([,f])=>f.done).map(([k])=>LBLS[k]);
+      const isDraft=p.status==='draft'?' <span class="bdg" style="background:#f0f4ff;color:#3A7CA5">Draft</span>':'';
+      const ca=(p.assignedConsents||[]).length;
+      return'<tr>'
+        +'<td><strong>'+(p.firstName||'&mdash;')+'</strong></td>'
+        +'<td><strong>'+(p.lastName||'&mdash;')+'</strong></td>'
+        +'<td style="font-size:.78rem;color:var(--lt)">'+p.email+'</td>'
+        +'<td>'+(done.map(d=>'<span class="bdg bd">'+d+'</span>').join(' ')||'<span class="bdg" style="background:#eee;color:#999">None</span>')+isDraft+'</td>'
+        +'<td>'+(p.completedAt?new Date(p.completedAt).toLocaleDateString():'&mdash;')+'</td>'
+        +'<td>'+(p.lastActivity?new Date(p.lastActivity).toLocaleDateString():'&mdash;')+'</td>'
+        +'<td>'+(p.editionNumber>1?'Ed.'+p.editionNumber:'1')+'</td>'
+        +'<td style="white-space:nowrap">'
+        +'<button class="btn bP" style="padding:5px 10px;font-size:.75rem" onclick="staffViewPt(\''+p.id+'\')">View</button>'
+        +' <button class="btn bA" style="padding:5px 10px;font-size:.75rem;margin-left:3px" onclick="staffConsentModal(\''+p.id+'\')">Forms'+(ca?' ('+ca+')':'')+'</button>'
+        +'</td></tr>';
+    }).join('');
+  }catch(e){setLoading(false);toast('Could not load patients: '+e.message);}
+}
+
+async function staffViewPt(pid){
+  if(!checkStaffAuth())return;
+  const _p=_staffPatientCache[pid]||{};
+  setLoading(true,'Loading patient...');
+  try{
+    const data=await apiGet('admin-patient-detail',{patientId:pid},staffToken);
+    setLoading(false);
+    const nm=(data.patient.firstName+' '+data.patient.lastName).trim()||'(No name)';
+    document.getElementById('staffPtName').textContent=nm;
+    document.getElementById('staffPtEmail').textContent=data.patient.email;
+    // Add print button to staff patient view
+    const detail=document.getElementById('staffPtDetail');
+    detail.innerHTML='<div style="margin-bottom:14px;display:flex;gap:9px;flex-wrap:wrap">'
+      +'<button class="btn bA" style="padding:7px 12px;font-size:.78rem" onclick="openPrintModal(currentStaffPtData)">&#x1F5A8; Print Forms</button>'
+      +'</div>'+buildDetailHTML(data);
+    window._currentStaffPtData=data;
+    showV('vStaffPt');
+  }catch(e){setLoading(false);toast('Could not load patient: '+e.message);}
+}
+
+function staffConsentModal(pid){
+  if(!checkStaffAuth())return;
+  const _p=_staffPatientCache[pid]||{};
+  openConsentModalWithToken(pid,_p.email,_p.assignedConsents||[],staffToken);
+}
+
+function openConsentModalWithToken(pid,email,assigned,token){
+  consentTargetId=pid;
+  consentTargetToken=token;
+  document.getElementById('consentModalSub').textContent='Patient: '+email;
+  document.getElementById('consentCheckList').innerHTML=CONSENT_FORMS.map(cf=>{
+    const chk=assigned.includes(cf.id)?'checked':'';
+    return'<div class="citem"><input type="checkbox" id="cf_'+cf.id+'" '+chk+'>'
+      +'<div style="flex:1"><label for="cf_'+cf.id+'" style="font-weight:700;font-size:.88rem;cursor:pointer">'+cf.label+'</label>'
+      +'<div style="font-size:.75rem;color:var(--lt)">'+cf.desc+'</div></div></div>';
+  }).join('');
+  document.getElementById('consentOverlay').classList.remove('hidden');
+}
+
+// ── ADMIN TAB SWITCHING ───────────────────────────────────────────────
+function switchAdminTab(tab){
+  document.getElementById('adminPatientsPanel').classList.toggle('hidden',tab!=='patients');
+  document.getElementById('adminStaffPanel').classList.toggle('hidden',tab!=='staff');
+  document.getElementById('tabPatients').style.borderBottomColor=tab==='patients'?'var(--pri)':'transparent';
+  document.getElementById('tabPatients').style.color=tab==='patients'?'var(--pri)':'var(--lt)';
+  document.getElementById('tabStaff').style.borderBottomColor=tab==='staff'?'var(--pri)':'transparent';
+  document.getElementById('tabStaff').style.color=tab==='staff'?'var(--pri)':'var(--lt)';
+  if(tab==='staff')loadStaffList();
+}
+
+// ── STAFF MANAGEMENT ─────────────────────────────────────────────────
+function openAddStaffModal(){
+  if(!checkAdminAuth())return;
+  document.getElementById('si_first').value='';
+  document.getElementById('si_last').value='';
+  document.getElementById('si_email').value='';
+  document.getElementById('siErr').classList.add('hidden');
+  document.getElementById('siOk').classList.add('hidden');
+  document.getElementById('siSendBtn').disabled=false;
+  document.getElementById('siSendBtn').textContent='\u2709 Send Invitation';
+  document.getElementById('addStaffOverlay').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('si_first').focus(),150);
+}
+function closeAddStaffModal(){document.getElementById('addStaffOverlay').classList.add('hidden');}
+
+async function sendStaffInvite(){
+  if(!checkAdminAuth())return;
+  const firstName=document.getElementById('si_first').value.trim();
+  const lastName=document.getElementById('si_last').value.trim();
+  const email=document.getElementById('si_email').value.trim().toLowerCase();
+  if(!firstName){showErr('siErr','First name is required.');return;}
+  if(!lastName){showErr('siErr','Last name is required.');return;}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showErr('siErr','A valid email is required.');return;}
+  const btn=document.getElementById('siSendBtn');
+  btn.disabled=true; btn.textContent='Sending...';
+  try{
+    const res=await apiPost('staff-invite',{firstName,lastName,email},adminToken);
+    btn.textContent='\u2713 Sent';
+    document.getElementById('siOk').textContent='Invitation sent to '+email+(res.sent?'':' (SMTP not configured — share link manually: '+res.acceptUrl+')');
+    document.getElementById('siOk').classList.remove('hidden');
+    setTimeout(()=>{closeAddStaffModal();loadStaffList();},2500);
+  }catch(e){
+    btn.disabled=false; btn.textContent='\u2709 Send Invitation';
+    showErr('siErr',e.message||'Failed to send invitation.');
+  }
+}
+
+async function loadStaffList(){
+  if(!checkAdminAuth())return;
+  try{
+    const {staff}=await apiGet('admin-staff-list',{},adminToken);
+    document.getElementById('noStaff').classList.toggle('hidden',staff.length>0);
+    document.getElementById('staffTable').classList.toggle('hidden',staff.length===0);
+    document.getElementById('staffTableBody').innerHTML=staff.map(s=>{
+      const status=s.accepted_at?'<span class="bdg" style="background:#d5f5e3;color:#196f3d">Active</span>':'<span class="bdg" style="background:#fff3cd;color:#856404">Invited</span>';
+      return'<tr>'
+        +'<td><strong>'+s.first_name+' '+s.last_name+'</strong></td>'
+        +'<td style="font-size:.82rem;color:var(--lt)">'+s.email+'</td>'
+        +'<td>'+status+'</td>'
+        +'<td style="font-size:.78rem;color:var(--lt)">'+(s.invited_at?new Date(s.invited_at).toLocaleDateString():'&mdash;')+'</td>'
+        +'<td style="font-size:.78rem;color:var(--lt)">'+(s.accepted_at?new Date(s.accepted_at).toLocaleDateString():'Never')+'</td>'
+        +'<td><button class="btn bD" style="padding:4px 10px;font-size:.74rem" onclick="removeStaff(\''+s.id+'\',\''+s.first_name+' '+s.last_name+'\')">Remove</button></td>'
+        +'</tr>';
+    }).join('');
+  }catch(e){toast('Could not load staff: '+e.message);}
+}
+
+async function removeStaff(staffId,name){
+  if(!checkAdminAuth())return;
+  if(!confirm('Remove '+name+' from staff? They will immediately lose portal access.'))return;
+  try{
+    await apiPost('admin-staff-remove',{staffId},adminToken);
+    toast(name+' removed \u2713');
+    loadStaffList();
+  }catch(e){toast('Error: '+e.message);}
+}
+
+// ── PRINT SECTIONS MODAL ──────────────────────────────────────────────
+let _printData=null;
+function openPrintModal(data){
+  _printData=data;
+  const isAdmin=!!data.currentForms;
+  const forms=isAdmin?data.currentForms:data.forms||{};
+  const pt=data.patient||{};
+  const nm=isAdmin?(pt.firstName+' '+pt.lastName).trim():pt.name||'';
+  document.getElementById('printSectionsSub').textContent='Patient: '+nm+' — select a section to print.';
+  const sections=[
+    {key:'pi',  label:'Patient Information',  hasHH:false,  hasHIPAA:false, printFn:'printSection_pi'},
+    {key:'ins', label:'Insurance Information', hasHH:false,  hasHIPAA:false, printFn:'printSection_ins'},
+    {key:'hh',  label:'Health History',        hasHH:true,   hasHIPAA:false, printFn:'printSection_hh'},
+    {key:'hipaa',label:'HIPAA Privacy Notice', hasHH:false,  hasHIPAA:true,  printFn:'printSection_hipaa'},
+  ];
+  document.getElementById('printSectionsList').innerHTML=sections.map(s=>{
+    const done=(forms[s.key]&&forms[s.key].done)||false;
+    const status=done?'<span class="bdg" style="background:#d5f5e3;color:#196f3d">Completed</span>':'<span class="bdg" style="background:#eee;color:#999">Not submitted</span>';
+    const btnDisabled=done?'':'disabled style="opacity:.4;cursor:not-allowed"';
+    return'<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surf);border-radius:var(--r);border-left:4px solid '+(done?'var(--ok)':'var(--bdr)')+';">'
+      +'<div><div style="font-weight:700;font-size:.9rem;color:var(--sec)">'+s.label+'</div><div style="font-size:.74rem;color:var(--lt);margin-top:2px">'+status+'</div></div>'
+      +'<button class="btn bP" style="padding:6px 14px;font-size:.78rem" '+btnDisabled+' onclick="printSectionOf(\''+s.key+'\')">'
+      +'&#x1F5A8; Print</button>'
+      +'</div>';
+  }).join('');
+  document.getElementById('printSectionsOverlay').classList.remove('hidden');
+}
+
+function printSectionOf(key){
+  if(!_printData)return;
+  if(key==='hh')openHHPdf(_printData);
+  else if(key==='hipaa')openHIPAAPdf(_printData);
+  else openSectionPdf(_printData,key);
+}
+
+function openSectionPdf(data,key){
+  const isAdmin=!!data.currentForms;
+  const forms=isAdmin?data.currentForms:data.forms||{};
+  const sigs=data.signatures||{};
+  const pt=data.patient||{};
+  const nm=isAdmin?(pt.firstName+' '+pt.lastName).trim():pt.name||'';
+  const fv=v=>v||'<span style="color:#bbb">&mdash;</span>';
+  const pi=forms.pi?.data||{}, ins=forms.ins?.data||{};
+  const w=window.open('','_blank','width=900,height=900');
+  let body='';
+
+  if(key==='pi'){
+    body='<div class="sec">Personal Information</div>'
+      +'<div class="row2"><div><span class="k">Patient Name:</span> '+fv(pi.name)+'</div><div><span class="k">Date of Birth:</span> '+fv(pi.dob)+'</div></div>'
+      +'<div class="row2"><div><span class="k">Sex:</span> '+fv(pi.sex)+'</div><div><span class="k">Marital Status:</span> '+fv(pi.marital)+'</div></div>'
+      +'<div class="row2"><div><span class="k">Cell Phone:</span> '+fv(pi.cell)+'</div><div><span class="k">Alt Phone:</span> '+fv(pi.alt_phone)+'</div></div>'
+      +'<div class="row2"><div><span class="k">Email:</span> '+fv(pi.email||pt.email)+'</div><div><span class="k">Voicemail OK:</span> '+fv(pi.voicemail)+'</div></div>'
+      +'<div><span class="k">Home Address:</span> '+([pi.addr,pi.city,pi.state,pi.zip].filter(Boolean).join(', ')||'&mdash;')+'</div>'
+      +'<div class="row2"><div><span class="k">Employer:</span> '+fv(pi.employer)+'</div><div><span class="k">Occupation:</span> '+fv(pi.occ)+'</div></div>'
+      +'<div class="sec">Emergency Contact</div>'
+      +'<div class="row2"><div><span class="k">Name:</span> '+fv(pi.ec_name)+'</div><div><span class="k">Relationship:</span> '+fv(pi.ec_rel)+'</div></div>'
+      +'<div><span class="k">Phone:</span> '+fv(pi.ec_phone)+'</div>'
+      +(pi.rp_name?'<div class="sec">Responsible Party</div><div class="row2"><div><span class="k">Name:</span> '+fv(pi.rp_name)+'</div><div><span class="k">Phone:</span> '+fv(pi.rp_cell)+'</div></div>'    :'')
+      +'<div class="sec">Signatures</div>'
+      +(sigs.sigFin?'<div class="siglbl">Financial Agreement — '+fv(pi.fin_dt)+'</div><img class="sigimg" src="'+sigs.sigFin+'"><br>':'')
+      +(sigs.sigPriv?'<div class="siglbl">Privacy Acknowledgment — '+fv(pi.priv_dt)+'</div><img class="sigimg" src="'+sigs.sigPriv+'">':'');
+  } else if(key==='ins'){
+    const ib=(title,pre)=>'<div class="sec">'+title+'</div>'
+      +'<div class="row2"><div><span class="k">Policy Holder:</span> '+fv(ins[pre+'holder'])+'</div><div><span class="k">Employer:</span> '+fv(ins[pre+'emp'])+'</div></div>'
+      +'<div class="row2"><div><span class="k">Insurance Co:</span> '+fv(ins[pre+'co'])+'</div><div><span class="k">Group #:</span> '+fv(ins[pre+'grp'])+'</div></div>'
+      +'<div><span class="k">Policy/Subscriber ID:</span> '+fv(ins[pre+'pol'])+'</div>';
+    body=ib('Primary Dental Insurance','pd_')+ib('Secondary Dental Insurance','sd_')
+      +ib('Primary Medical Insurance','pm_')+ib('Secondary Medical Insurance','sm_')
+      +(ins.no_ins?'<div style="padding:7px;background:#fff3cd;border-radius:4px;margin-top:8px">Patient indicated no insurance to submit.</div>':'')
+      +(sigs.sigIns?'<div class="sec">Signature</div><img class="sigimg" src="'+sigs.sigIns+'"><br><span class="siglbl">Date: '+fv(ins.ins_dt)+'</span>':'');
+  }
+
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+key.toUpperCase()+' — '+nm+'</title>'
+    +'<style>@page{size:letter;margin:.6in}*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:9pt;color:#2E2E2E;line-height:1.5}'
+    +'.hdr{text-align:center;border-bottom:2px solid #1F3A5F;padding-bottom:8px;margin-bottom:12px}'
+    +'.hdr h1{font-size:12pt;color:#1F3A5F;font-weight:700}.hdr p{font-size:7.5pt;color:#6b7a8d}'
+    +'.ptbox{background:#F4F6F8;padding:7px 10px;border-radius:4px;margin-bottom:12px;font-size:8.5pt}'
+    +'.sec{font-size:7.5pt;font-weight:700;color:#1F3A5F;text-transform:uppercase;letter-spacing:.06em;border-bottom:1.5px solid #6FB3B8;padding-bottom:3px;margin:10px 0 6px}'
+    +'.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:5px}'
+    +'.k{font-weight:700;color:#1F3A5F}.sigimg{height:55px;border:1px solid #d4dde6;border-radius:3px;margin-top:4px}'
+    +'.siglbl{font-size:7pt;color:#6b7a8d;text-transform:uppercase;font-weight:700}'
+    +'@media print{button{display:none!important}}</style></head><body>'
+    +'<div class="hdr"><h1>Davis Center for Oral and Maxillofacial Surgery</h1><p>Paul Benson, DMD, MD &middot; 890 W Heritage Park Blvd, Suite 103 &middot; Layton, UT 84041 &middot; (801) 614-0999</p></div>'
+    +'<div class="ptbox"><strong>Patient:</strong> '+nm+' &nbsp;|&nbsp; <strong>Email:</strong> '+(pt.email||'')+(pt.completedAt?' &nbsp;|&nbsp; <strong>Submitted:</strong> '+new Date(pt.completedAt).toLocaleDateString():' &nbsp;|&nbsp; <em>In progress</em>')+'</div>'
+    +body
+    +'<br><div style="text-align:center"><button onclick="window.print()" style="padding:9px 22px;background:#3A7CA5;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:700">&#x1F5A8; Print / Save as PDF</button></div>'
+    +'</body></html>');
+  w.document.close();
+}
+
 function buildStepsHTML(){
   document.getElementById('intakeCW').innerHTML='<div id="s1">'+step1HTML()+'</div><div id="s2" class="hidden">'+step2HTML()+'</div><div id="s3" class="hidden">'+step3HTML()+'</div><div id="s4" class="hidden">'+step4HTML()+'</div>';
   const ssn=document.getElementById('f_ssn'); // intentionally undefined — SSN removed
@@ -1104,6 +1549,8 @@ function buildStepsHTML(){
 document.getElementById('consentOverlay').addEventListener('click',function(e){if(e.target===this)closeConsentModal();});
 document.getElementById('reminderApptOverlay').addEventListener('click',function(e){if(e.target===this)closeReminderApptModal();});
 document.getElementById('newPatientOverlay').addEventListener('click',function(e){if(e.target===this)closeNewPatientModal();});
+document.getElementById('addStaffOverlay').addEventListener('click',function(e){if(e.target===this)closeAddStaffModal();});
+document.getElementById('printSectionsOverlay').addEventListener('click',function(e){if(e.target===this)document.getElementById('printSectionsOverlay').classList.add('hidden');});
 document.getElementById('reminderPreviewOverlay').addEventListener('click',function(e){if(e.target===this)closeReminderPreviewModal();});
 document.getElementById('editionOverlay').addEventListener('click',function(e){if(e.target===this)closeEditionModal();});
 </script>
