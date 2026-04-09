@@ -1,19 +1,21 @@
 'use strict';
 const {
   supabase, ok, badRequest, unauthorized, serverError, handleOptions,
-  requireAdmin, logAudit
+  requireAdmin, requireStaff, logAudit
 } = require('./_utils');
 
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return handleOptions();
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
 
-  if (!requireAdmin(event)) return unauthorized();
+  const caller = requireStaff(event);
+  if (!caller) return unauthorized();
 
   const patientId = event.queryStringParameters?.patientId;
   if (!patientId) return badRequest('patientId required');
 
-  const adminEmail = process.env.ADMIN_EMAIL;
+  const caller2 = requireStaff(event)||{};
+  const adminEmail = caller2.email || process.env.ADMIN_EMAIL;
 
   try {
     const { data: patient, error: pErr } = await supabase

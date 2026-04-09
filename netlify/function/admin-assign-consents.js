@@ -1,7 +1,7 @@
 'use strict';
 const {
   supabase, ok, badRequest, unauthorized, serverError, handleOptions,
-  requireAdmin, logAudit
+  requireAdmin, requireStaff, logAudit
 } = require('./_utils');
 
 const VALID_CONSENTS = ['surgical','anesthesia','photo','postop','iv_sed'];
@@ -10,7 +10,8 @@ exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return handleOptions();
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
 
-  if (!requireAdmin(event)) return unauthorized();
+  const caller = requireStaff(event);
+  if (!caller) return unauthorized();
 
   let body;
   try { body = JSON.parse(event.body || '{}'); } catch { return badRequest('Invalid JSON'); }

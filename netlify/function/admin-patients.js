@@ -8,7 +8,8 @@ exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return handleOptions();
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
 
-  if (!requireAdmin(event)) return unauthorized();
+  const caller = requireStaff(event);
+  if (!caller) return unauthorized();
 
   const adminEmail = process.env.ADMIN_EMAIL;
 

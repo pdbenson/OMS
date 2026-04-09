@@ -61,6 +61,14 @@ function requirePatient(event) {
   return decoded; // { sub: patientId, email }
 }
 
+function requireStaff(event) {
+  const token = getBearerToken(event);
+  if (!token) return null;
+  const decoded = verifyToken(token);
+  if (!decoded || (decoded.role !== 'staff' && decoded.role !== 'admin')) return null;
+  return decoded; // { role, staffId?, email, name? }
+}
+
 function requireAdmin(event) {
   const token = getBearerToken(event);
   if (!token) return false;
@@ -104,6 +112,6 @@ module.exports = {
   supabase,
   ok, created, badRequest, unauthorized, forbidden, serverError,
   signPatientToken, signAdminToken, verifyToken, getBearerToken,
-  requirePatient, requireAdmin,
+  requirePatient, requireAdmin, requireStaff,
   logAudit, handleOptions,
 };
