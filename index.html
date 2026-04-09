@@ -151,6 +151,26 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
 <div class="overlay hidden" id="consentOverlay"><div class="mbox"><h3>Assign Consent Forms</h3><p id="consentModalSub"></p><div class="clist" id="consentCheckList"></div><div class="modal-btns"><button class="btn bS" onclick="closeConsentModal()">Cancel</button><button class="btn bP" onclick="saveConsentAssignment()">Save Assignment</button></div></div></div>
 <div class="overlay hidden" id="editionOverlay"><div class="mbox"><h3>Forms Already Completed</h3><p id="editionModalMsg"></p><div class="modal-btns"><button class="btn bS" onclick="closeEditionModal()">Cancel</button><button class="btn bD" onclick="confirmNewEdition()">Create New Edition</button></div></div></div>
 <div class="toast" id="toast"></div>
+<div class="overlay hidden" id="newPatientOverlay">
+  <div class="mbox" style="max-width:520px">
+    <h3>Invite New Patient</h3>
+    <p>Enter the patient's details below. A preregistration invitation will be sent to their email address.</p>
+    <div class="fg" style="margin-bottom:10px">
+      <div class="fd"><label class="lbl">First Name <span class="req">*</span></label><input class="inp" id="np_first" placeholder="First name" onkeypress="if(event.key==='Enter')document.getElementById('np_last').focus()"></div>
+      <div class="fd"><label class="lbl">Last Name <span class="req">*</span></label><input class="inp" id="np_last" placeholder="Last name" onkeypress="if(event.key==='Enter')document.getElementById('np_email').focus()"></div>
+      <div class="fd full"><label class="lbl">Email Address <span class="req">*</span></label><input type="email" class="inp" id="np_email" placeholder="patient@example.com" onkeypress="if(event.key==='Enter')document.getElementById('np_phone').focus()"></div>
+      <div class="fd full"><label class="lbl">Phone Number <small style="text-transform:none;font-weight:400;font-size:.85em">(for future SMS reminders)</small></label><input type="tel" class="inp" id="np_phone" placeholder="(801) 555-0000"></div>
+    </div>
+    <div id="npErr" class="alert ae hidden"></div>
+    <div id="npOk" class="alert ao hidden"></div>
+    <div class="modal-btns">
+      <button class="btn bS" onclick="closeNewPatientModal()">Cancel</button>
+      <button class="btn bP" id="npSendBtn" onclick="sendNewPatientInvite()">&#x2709; Send Invitation</button>
+    </div>
+  </div>
+</div>
+
+
 <div class="overlay hidden" id="reminderApptOverlay">
   <div class="mbox">
     <h3>Schedule Details</h3>
@@ -191,7 +211,7 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
     <div class="ldiv"></div>
     <p class="ldoc">Paul Benson, DMD, MD</p>
     <div class="lbtns">
-      <button class="btnPL" onclick="gotoEmail('intake')">Preregister</button>
+      <button class="btnPL" onclick="gotoEmail('intake')">Pre-register</button>
       <button class="btnSL" onclick="gotoEmail('view')">View Forms</button>
     </div>
   </div>
@@ -203,7 +223,7 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
   <div class="phdr"><button class="backBtn" onclick="showV('vLand')">&#8592; Back</button><div class="logo">Davis Center for Oral and Maxillofacial Surgery</div><div class="sub">Paul Benson, DMD, MD</div></div>
   <div class="cw" style="display:flex;align-items:center;flex:1;max-width:480px">
     <div class="card" style="width:100%">
-      <div class="chdl"><h2 id="emailTitle">Preregister</h2><p id="emailSub">Enter your email address to begin your intake forms.</p></div>
+      <div class="chdl"><h2 id="emailTitle">Pre-register</h2><p id="emailSub">Enter your email address to begin your intake forms.</p></div>
       <div class="fd" style="margin-bottom:13px"><label class="lbl">Email Address</label><input type="email" class="inp" id="inEmail" placeholder="you@example.com" onkeypress="if(event.key==='Enter')doEmail()"></div>
       <div id="emailErr" class="alert ae hidden"></div>
       <button class="btn bP" style="width:100%" onclick="doEmail()">Continue &#8594;</button>
@@ -345,6 +365,12 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
     <button onclick="renewAdminSession()">Renew Session</button>
   </div>
   <div style="padding:18px 16px;flex:1;overflow:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div style="font-size:.9rem;color:var(--lt)">Patient preregistration records</div>
+      <button class="btn bG" style="display:flex;align-items:center;gap:7px" onclick="openNewPatientModal()">
+        <span style="font-size:1.1rem;font-weight:400">&#xFF0B;</span> New Patient Invite
+      </button>
+    </div>
     <div class="tblwrap">
       <table class="ptbl">
         <thead><tr><th>First Name</th><th>Last Name</th><th>Email</th><th>Forms Completed</th><th>Date Completed</th><th>Last Activity</th><th>Ed.</th><th>Actions</th></tr></thead>
@@ -352,6 +378,7 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
       </table>
     </div>
     <div id="noPatients" class="alert ai hidden" style="margin-top:18px">No patient records found yet.</div>
+    </div>
   </div>
   <div class="pgft">Davis Center for Oral and Maxillofacial Surgery &middot; 890 W Heritage Park Blvd, Suite 103 &middot; Layton, Utah 84041<br>(801) 614-0999 &middot; <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a><div class="pgft-nav"><a href="/hipaa-compliance.html" target="_blank">HIPAA Compliance</a><span class="pgft-sep">|</span><a href="/terms-privacy.html" target="_blank">Terms &amp; Privacy</a></div></div>
 </div>
@@ -423,7 +450,7 @@ function setV(id,v){const el=document.getElementById(id);if(el)el.value=v||'';}
 // ── EMAIL ENTRY ────────────────────────────────────────────────────────
 function gotoEmail(m){
   mode=m;
-  document.getElementById('emailTitle').textContent=m==='intake'?'Preregister':'View Your Forms';
+  document.getElementById('emailTitle').textContent=m==='intake'?'Pre-register':'View Your Forms';
   document.getElementById('emailSub').textContent=m==='intake'?'Enter your email to begin or continue your intake forms.':'Enter your email to view your current form status.';
   document.getElementById('inEmail').value='';
   showV('vEmail');
@@ -832,7 +859,7 @@ async function adminViewPt(pid){
     setLoading(false); adminPtDetail=data;
     const nm=(data.patient.firstName+' '+data.patient.lastName).trim()||'(No name)';
     document.getElementById('aptName').textContent=nm;
-    document.getElementById('aptEmail').textContent=email;
+    document.getElementById('aptEmail').textContent=adminPtEmail;
     document.getElementById('aptDetail').innerHTML=buildDetailHTML(data);
     showV('vAdminPt');
   }catch(e){setLoading(false);toast('Could not load patient: '+e.message);}
@@ -1022,6 +1049,49 @@ async function sendReminderEmail(){
   }
 }
 
+
+// ── NEW PATIENT INVITE ────────────────────────────────────────────────
+function openNewPatientModal(){
+  if(!checkAdminAuth())return;
+  document.getElementById('np_first').value='';
+  document.getElementById('np_last').value='';
+  document.getElementById('np_email').value='';
+  document.getElementById('np_phone').value='';
+  document.getElementById('npErr').classList.add('hidden');
+  document.getElementById('npOk').classList.add('hidden');
+  document.getElementById('npSendBtn').disabled=false;
+  document.getElementById('npSendBtn').textContent='✉ Send Invitation';
+  document.getElementById('newPatientOverlay').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('np_first').focus(),150);
+}
+function closeNewPatientModal(){
+  document.getElementById('newPatientOverlay').classList.add('hidden');
+}
+async function sendNewPatientInvite(){
+  if(!checkAdminAuth())return;
+  const firstName=document.getElementById('np_first').value.trim();
+  const lastName=document.getElementById('np_last').value.trim();
+  const email=document.getElementById('np_email').value.trim().toLowerCase();
+  const phone=document.getElementById('np_phone').value.trim();
+  document.getElementById('npErr').classList.add('hidden');
+  document.getElementById('npOk').classList.add('hidden');
+  if(!firstName){showErr('npErr','First name is required.');return;}
+  if(!lastName){showErr('npErr','Last name is required.');return;}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showErr('npErr','A valid email address is required.');return;}
+  const btn=document.getElementById('npSendBtn');
+  btn.disabled=true; btn.textContent='Sending...';
+  try{
+    await apiPost('invite-patient',{firstName,lastName,email,phone},adminToken);
+    btn.textContent='✓ Sent';
+    document.getElementById('npOk').textContent='Invitation sent successfully to '+email;
+    document.getElementById('npOk').classList.remove('hidden');
+    setTimeout(()=>{closeNewPatientModal();loadDash();},2200);
+  }catch(e){
+    btn.disabled=false; btn.textContent='✉ Send Invitation';
+    showErr('npErr',e.message||'Failed to send invitation. Please try again.');
+  }
+}
+
 function buildStepsHTML(){
   document.getElementById('intakeCW').innerHTML='<div id="s1">'+step1HTML()+'</div><div id="s2" class="hidden">'+step2HTML()+'</div><div id="s3" class="hidden">'+step3HTML()+'</div><div id="s4" class="hidden">'+step4HTML()+'</div>';
   const ssn=document.getElementById('f_ssn'); // intentionally undefined — SSN removed
@@ -1034,6 +1104,7 @@ function buildStepsHTML(){
 // ── MODAL CLOSE ON OVERLAY CLICK ──────────────────────────────────────
 document.getElementById('consentOverlay').addEventListener('click',function(e){if(e.target===this)closeConsentModal();});
 document.getElementById('reminderApptOverlay').addEventListener('click',function(e){if(e.target===this)closeReminderApptModal();});
+document.getElementById('newPatientOverlay').addEventListener('click',function(e){if(e.target===this)closeNewPatientModal();});
 document.getElementById('reminderPreviewOverlay').addEventListener('click',function(e){if(e.target===this)closeReminderPreviewModal();});
 document.getElementById('editionOverlay').addEventListener('click',function(e){if(e.target===this)closeEditionModal();});
 </script>
