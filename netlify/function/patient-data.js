@@ -17,7 +17,7 @@ exports.handler = async (event) => {
     // Patient record
     const { data: patient, error: pErr } = await supabase
       .from('patients')
-      .select('id, email, first_name, last_name, status, edition_number, last_activity, completed_at, assigned_consents')
+      .select('id, email, first_name, last_name, phone, status, edition_number, last_activity, completed_at, assigned_consents')
       .eq('id', patientId)
       .single();
 
@@ -56,6 +56,9 @@ exports.handler = async (event) => {
         id:              patient.id,
         email:           patient.email,
         name:            `${patient.first_name || ''} ${patient.last_name || ''}`.trim(),
+        firstName:       patient.first_name || '',
+        lastName:        patient.last_name  || '',
+        phone:           patient.phone      || '',
         status:          patient.status,
         editionNumber:   patient.edition_number,
         lastActivity:    patient.last_activity,

@@ -72,7 +72,7 @@ exports.handler = async (event) => {
         <!-- CTA BUTTON -->
         <table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0">
           <tr><td align="center">
-            <a href="${siteUrl}" style="display:inline-block;background:#3A7CA5;color:#ffffff;text-decoration:none;padding:13px 32px;border-radius:6px;font-weight:700;font-size:.95rem;letter-spacing:.02em">Begin My Preregistration &rarr;</a>
+            <a href="${siteUrl}?action=preregister" style="display:inline-block;background:#3A7CA5;color:#ffffff;text-decoration:none;padding:13px 32px;border-radius:6px;font-weight:700;font-size:.95rem;letter-spacing:.02em">Begin My Preregistration &rarr;</a>
           </td></tr>
           <tr><td align="center" style="padding-top:8px">
             <span style="font-size:.75rem;color:#6b7a8d">${siteUrl}?action=preregister</span>
