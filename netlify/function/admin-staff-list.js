@@ -9,7 +9,7 @@ exports.handler = async (event) => {
   try {
     const { data, error } = await supabase
       .from('staff')
-      .select('id, email, first_name, last_name, invited_at, accepted_at, active, invited_by')
+      .select('id, email, first_name, last_name, role, invited_at, accepted_at, active, invited_by')
       .order('created_at', { ascending: false });
 
     if (error) throw error;

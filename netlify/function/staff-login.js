@@ -16,7 +16,7 @@ exports.handler = async (event) => {
   try {
     const { data: staff, error } = await supabase
       .from('staff')
-      .select('id, email, first_name, last_name, password_hash, accepted_at, active')
+      .select('id, email, first_name, last_name, password_hash, accepted_at, active, role')
       .eq('email', email.trim().toLowerCase())
       .maybeSingle();
 
@@ -37,8 +37,9 @@ exports.handler = async (event) => {
       return unauthorized('Invalid email or password');
     }
 
+    const staffRole = staff.role || 'staff';
     const token = jwt.sign(
-      { role: 'staff', staffId: staff.id, email: staff.email,
+      { role: staffRole, staffId: staff.id, email: staff.email,
         name: `${staff.first_name} ${staff.last_name}` },
       process.env.JWT_SECRET,
       { expiresIn: '15m' }
@@ -51,6 +52,7 @@ exports.handler = async (event) => {
       expiresAt: Date.now() + 15 * 60 * 1000,
       name: `${staff.first_name} ${staff.last_name}`,
       email: staff.email,
+      role: staffRole,
     });
 
   } catch (e) {

@@ -15,8 +15,9 @@ exports.handler = async (event) => {
   let body;
   try { body = JSON.parse(event.body || '{}'); } catch { return badRequest('Invalid JSON'); }
 
-  const { firstName, lastName, email } = body;
+  const { firstName, lastName, email, role } = body;
   if (!firstName || !lastName || !email) return badRequest('firstName, lastName, and email required');
+  const staffRole = (role === 'provider') ? 'provider' : 'staff';
 
   const siteUrl    = process.env.SITE_URL || 'https://oms.tapat.dev';
   const adminEmail = process.env.ADMIN_EMAIL;
@@ -32,6 +33,7 @@ exports.handler = async (event) => {
         email: email.toLowerCase().trim(),
         first_name: firstName.trim(),
         last_name: lastName.trim(),
+        role: staffRole,
         invite_token: inviteToken,
         invited_at: new Date().toISOString(),
         invited_by: adminEmail,
@@ -57,7 +59,8 @@ exports.handler = async (event) => {
       auth:   { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
     });
 
-    const subject = `You're invited to the Davis Center OMS Staff Portal`;
+    const roleLabel = staffRole === 'provider' ? 'Provider' : 'Staff Member';
+    const subject = `You're invited to the Davis Center OMS ${roleLabel} Portal`;
 
     const htmlBody = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,sans-serif;color:#2E2E2E">
