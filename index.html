@@ -25,8 +25,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
 .btnPL:hover{background:#2d6a8f;transform:translateY(-1px)}
 .btnSL{background:transparent;color:#fff;border:2px solid rgba(111,179,184,.6);padding:13px 32px;border-radius:var(--r);font-family:'Nunito',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s}
 .btnSL:hover{border-color:var(--acc);background:rgba(111,179,184,.1)}
-.adminBtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);padding:5px 14px;border-radius:var(--r);font-family:'Nunito',sans-serif;font-size:.75rem;cursor:pointer;transition:all .2s;display:inline-block;margin-top:8px}
-.adminBtn:hover{background:rgba(255,255,255,.2);color:#fff}
+.adminBtn{position:fixed;bottom:20px;right:20px;background:rgba(31,58,95,.85);border:1px solid rgba(111,179,184,.4);color:rgba(255,255,255,.7);padding:7px 16px;border-radius:var(--r);font-family:'Nunito',sans-serif;font-size:.78rem;cursor:pointer;transition:all .2s;z-index:9000;backdrop-filter:blur(4px)}
+.adminBtn:hover{background:rgba(58,124,165,.9);color:#fff;border-color:rgba(111,179,184,.7)}
 .lfooter{margin-top:auto;text-align:center;padding:15px 24px;background:rgba(0,0,0,.28);color:rgba(255,255,255,.6);font-size:.78rem;line-height:1.8;z-index:2;position:relative}
 .lfooter a,.pgft a{color:var(--acc);text-decoration:none}
 .phdr{background:var(--sec);color:#fff;text-align:center;padding:17px 24px;position:relative;flex-shrink:0}
@@ -155,6 +155,7 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
 <div class="overlay hidden" id="consentOverlay"><div class="mbox"><h3>Assign Consent Forms</h3><p id="consentModalSub"></p><div class="clist" id="consentCheckList"></div><div class="modal-btns"><button class="btn bS" onclick="closeConsentModal()">Cancel</button><button class="btn bP" onclick="saveConsentAssignment()">Save Assignment</button></div></div></div>
 <div class="overlay hidden" id="editionOverlay"><div class="mbox"><h3>Forms Already Completed</h3><p id="editionModalMsg"></p><div class="modal-btns"><button class="btn bS" onclick="closeEditionModal()">Cancel</button><button class="btn bD" onclick="confirmNewEdition()">Create New Edition</button></div></div></div>
 <div class="toast" id="toast"></div>
+<button type="button" class="adminBtn" id="adminAccessBtn" onclick="showV('vAdminLogin')">Admin</button>
 <div class="overlay hidden" id="addStaffOverlay">
   <div class="mbox" style="max-width:480px">
     <h3>Add Staff Member</h3>
@@ -263,7 +264,7 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
       <button class="btnSL" onclick="gotoEmail('view')">View Forms</button>
     </div>
   </div>
-  <div class="lfooter"><strong>Davis Center for Oral and Maxillofacial Surgery</strong><br>890 W Heritage Park Blvd, Suite 103 &middot; Layton, Utah 84041<br>(801) 614-0999 &middot; <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a><div class="footer-nav"><a href="/hipaa-compliance.html" target="_blank">HIPAA Compliance</a><span class="footer-sep">|</span><a href="/terms-privacy.html" target="_blank">Terms &amp; Privacy</a><span class="footer-sep">|</span><button type="button" class="adminBtn" onclick="showV('vAdminLogin')">Admin</button></div></div>
+  <div class="lfooter"><strong>Davis Center for Oral and Maxillofacial Surgery</strong><br>890 W Heritage Park Blvd, Suite 103 &middot; Layton, Utah 84041<br>(801) 614-0999 &middot; <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a><div class="footer-nav"><a href="/hipaa-compliance.html" target="_blank">HIPAA Compliance</a><span class="footer-sep">|</span><a href="/terms-privacy.html" target="_blank">Terms &amp; Privacy</a></div></div>
 </div>
 
 <!-- EMAIL ENTRY -->
@@ -567,7 +568,7 @@ async function apiPost(fn, body, token) {
 }
 
 // ── UI HELPERS ─────────────────────────────────────────────────────────
-function showV(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));const el=document.getElementById(id);if(el)el.classList.add('active');window.scrollTo(0,0);}
+function showV(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));const el=document.getElementById(id);if(el)el.classList.add('active');window.scrollTo(0,0);const ab=document.getElementById('adminAccessBtn');if(ab)ab.style.display=(id==='vLand')?'':'none';}
 function toast(msg,dur=2500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
 function showErr(id,msg){const el=document.getElementById(id);if(el){el.textContent=msg;el.classList.remove('hidden');el.scrollIntoView({behavior:'smooth',block:'nearest'});}}
 function hideErr(id){const el=document.getElementById(id);if(el)el.classList.add('hidden');}
