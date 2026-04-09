@@ -15,7 +15,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
 .view{display:none;flex-direction:column;flex:1;min-height:100vh}.view.active{display:flex}
 #vLand{background:var(--sec);position:relative;overflow:hidden;display:flex;flex-direction:column}
 .lbg{position:absolute;inset:0;background:radial-gradient(ellipse at 18% 55%,rgba(58,124,165,.28) 0%,transparent 60%),radial-gradient(ellipse at 82% 18%,rgba(111,179,184,.22) 0%,transparent 50%),linear-gradient(155deg,#1F3A5F 0%,#0d1e38 100%)}
-.lcont{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:60px 24px 100px;text-align:center}
+.lcont{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:60px 24px 60px;text-align:center}
 .lembl{width:78px;height:78px;background:rgba(58,124,165,.25);border:2px solid rgba(111,179,184,.45);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;font-size:2rem}
 .ltitle{font-family:'Libre Baskerville',serif;font-size:2rem;font-weight:700;color:#fff;line-height:1.2;max-width:530px;margin:0 auto}
 .ldiv{width:56px;height:2px;background:var(--acc);margin:18px auto}
@@ -263,7 +263,7 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
       <button class="btnSL" onclick="gotoEmail('view')">View Forms</button>
     </div>
   </div>
-  <div class="lfooter"><strong>Davis Center for Oral and Maxillofacial Surgery</strong><br>890 W Heritage Park Blvd, Suite 103 &middot; Layton, Utah 84041<br>(801) 614-0999 &middot; <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a><div class="footer-nav"><a href="/hipaa-compliance.html" target="_blank">HIPAA Compliance</a><span class="footer-sep">|</span><a href="/terms-privacy.html" target="_blank">Terms &amp; Privacy</a><span class="footer-sep">|</span><button class="adminBtn" onclick="showV('vAdminLogin')">Admin</button></div></div>
+  <div class="lfooter"><strong>Davis Center for Oral and Maxillofacial Surgery</strong><br>890 W Heritage Park Blvd, Suite 103 &middot; Layton, Utah 84041<br>(801) 614-0999 &middot; <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a><div class="footer-nav"><a href="/hipaa-compliance.html" target="_blank">HIPAA Compliance</a><span class="footer-sep">|</span><a href="/terms-privacy.html" target="_blank">Terms &amp; Privacy</a><span class="footer-sep">|</span><button type="button" class="adminBtn" onclick="showV('vAdminLogin')">Admin</button></div></div>
 </div>
 
 <!-- EMAIL ENTRY -->
