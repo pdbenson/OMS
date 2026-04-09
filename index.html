@@ -271,7 +271,7 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
   <div class="phdr"><button class="backBtn" onclick="showV('vLand')">&#8592; Back</button><div class="logo">Davis Center for Oral and Maxillofacial Surgery</div><div class="sub">Paul Benson, DMD, MD</div></div>
   <div class="cw" style="display:flex;align-items:center;flex:1;max-width:480px">
     <div class="card" style="width:100%">
-      <div class="chdl"><h2 id="emailTitle">Pre-register</h2><p id="emailSub">Enter your email address to begin your intake forms.</p></div>
+      <div class="chdl"><p id="emailWelcome" class="hidden" style="font-size:.82rem;color:var(--pri);font-weight:700;margin-bottom:4px">Welcome to Davis Center for Oral and Maxillofacial Surgery</p><h2 id="emailTitle">Pre-register</h2><p id="emailSub">Enter your email to begin or continue your intake forms.</p></div>
       <div class="fd" style="margin-bottom:13px"><label class="lbl">Email Address</label><input type="email" class="inp" id="inEmail" placeholder="you@example.com" onkeypress="if(event.key==='Enter')doEmail()"></div>
       <div id="emailErr" class="alert ae hidden"></div>
       <button class="btn bP" style="width:100%" onclick="doEmail()">Continue &#8594;</button>
@@ -577,10 +577,12 @@ const gc=id=>(document.getElementById(id)||{}).checked||false;
 function setV(id,v){const el=document.getElementById(id);if(el)el.value=v||'';}
 
 // ── EMAIL ENTRY ────────────────────────────────────────────────────────
-function gotoEmail(m){
+function gotoEmail(m,fromInvite){
   mode=m;
   document.getElementById('emailTitle').textContent=m==='intake'?'Pre-register':'View Your Forms';
-  document.getElementById('emailSub').textContent=m==='intake'?'Enter your email to begin or continue your intake forms.':'Enter your email to view your current form status.';
+  document.getElementById('emailSub').textContent=m==='intake'?'Confirm your email to begin or continue your intake forms.':'Enter your email to view your current form status.';
+  const wEl=document.getElementById('emailWelcome');
+  if(wEl)wEl.classList.toggle('hidden',!fromInvite);
   document.getElementById('inEmail').value='';
   showV('vEmail');
   setTimeout(()=>document.getElementById('inEmail').focus(),200);
@@ -1615,6 +1617,14 @@ document.getElementById('addStaffOverlay').addEventListener('click',function(e){
 document.getElementById('printSectionsOverlay').addEventListener('click',function(e){if(e.target===this)document.getElementById('printSectionsOverlay').classList.add('hidden');});
 document.getElementById('reminderPreviewOverlay').addEventListener('click',function(e){if(e.target===this)closeReminderPreviewModal();});
 document.getElementById('editionOverlay').addEventListener('click',function(e){if(e.target===this)closeEditionModal();});
+
+// Auto-start preregister if URL has ?action=preregister (from invite email)
+(function(){
+  try{
+    const p=new URLSearchParams(window.location.search);
+    if(p.get('action')==='preregister') gotoEmail('intake',true);
+  }catch(e){}
+})();
 </script>
 </body>
 </html>
