@@ -25,6 +25,7 @@
   #   'unsafe-inline'     — required: every page has inline <script> blocks
   #   cdn.jsdelivr.net    — Supabase JS client library
   #   js.stripe.com       — Stripe.js
+  #   maps.googleapis.com maps.gstatic.com — Google Maps JS API
   # style-src             — CSS sources
   #   'self' 'unsafe-inline' — every page has inline <style> + style="..." attrs
   #   fonts.googleapis.com — Google Fonts stylesheets
@@ -37,6 +38,8 @@
   #   api.qrserver.com    — generated QR codes
   #   images.unsplash.com — sample property photos in travel
   #   villascabos.com     — third-party host's photos referenced in travel
+  #   maps.gstatic.com maps.googleapis.com *.googleusercontent.com  — Maps tiles, Street View, place photos
+  #   khms*.googleapis.com mts*.googleapis.com — alternate Maps tile hostnames
   # connect-src           — fetch/XHR/WebSocket destinations
   #   'self'              — same-origin (Netlify functions)
   #   *.tapat.dev         — cross-subdomain (wallet → marketplace, etc.)
@@ -45,6 +48,7 @@
   #   api.stripe.com      — Stripe API calls from client
   #   api.exchangerate-api.com — FX rates (Travel pricing)
   #   nominatim.openstreetmap.org — geocoding (Marketplace location field)
+  #   maps.googleapis.com — Maps Places/Directions/Geocoding API calls
   # frame-src             — embedded iframes
   #   js.stripe.com hooks.stripe.com — Stripe Elements + 3DS
   # frame-ancestors       — who can iframe US (clickjacking defense)
@@ -53,7 +57,10 @@
   # base-uri 'self'       — <base> tag can only point to same-origin
   # form-action 'self'    — forms can only submit to same-origin
   # upgrade-insecure-requests — auto-upgrade any http:// references to https://
-  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://aqskltkvqlhcqwortjio.supabase.co https://api.qrserver.com https://images.unsplash.com https://villascabos.com; connect-src 'self' https://*.tapat.dev https://aqskltkvqlhcqwortjio.supabase.co wss://aqskltkvqlhcqwortjio.supabase.co https://api.stripe.com https://api.exchangerate-api.com https://nominatim.openstreetmap.org; frame-src https://js.stripe.com https://hooks.stripe.com; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests
+  # report-uri — browsers POST violation reports here. Cross-origin OK since
+  # CSP reports bypass CORS. Endpoint lives in TAPAT.DEV but all sites point
+  # to it so violations land in one csp_violations table.
+  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://js.stripe.com https://maps.googleapis.com https://maps.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://aqskltkvqlhcqwortjio.supabase.co https://api.qrserver.com https://images.unsplash.com https://villascabos.com https://maps.gstatic.com https://maps.googleapis.com https://*.googleusercontent.com https://khms0.googleapis.com https://khms1.googleapis.com https://mts0.googleapis.com https://mts1.googleapis.com; connect-src 'self' https://*.tapat.dev https://aqskltkvqlhcqwortjio.supabase.co wss://aqskltkvqlhcqwortjio.supabase.co https://api.stripe.com https://api.exchangerate-api.com https://nominatim.openstreetmap.org https://maps.googleapis.com; frame-src https://js.stripe.com https://hooks.stripe.com; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests; report-uri https://tapat.dev/.netlify/functions/csp-report
 
   # ── Companion hardening headers (always-on, not gated by Report-Only) ──
   # Block MIME-type sniffing — prevents some XSS via mistyped uploads
