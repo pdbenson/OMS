@@ -1,0 +1,77 @@
+# ════════════════════════════════════════════════════════════════════
+# TΛPΛT — Netlify _headers
+# ════════════════════════════════════════════════════════════════════
+# This file sets HTTP response headers on every served page. Drop it
+# at the root of each Netlify site's publish directory:
+#   - TAPAT.DEV repo (wallet, admin, home, travel, designers)
+#   - TAPAT-Marketplace repo (marketplace, shops, storefront, etc.)
+#
+# After deploy, Netlify applies these headers to all matching paths.
+#
+# ── Phase ──
+# The CSP below is in REPORT-ONLY mode (header name ends -Report-Only).
+# Browsers will log violations to console but won't block anything. Walk
+# the app for a few hours/days, watch browser DevTools console for any
+# "Refused to ..." messages. When the console stays quiet during normal
+# use, rename the header to "Content-Security-Policy" (drop "-Report-Only")
+# to flip to enforcement.
+# ════════════════════════════════════════════════════════════════════
+
+/*
+  # ── CSP (Report-Only for now) ──
+  # default-src 'self'    — fall-through for any directive not listed
+  # script-src            — JS sources
+  #   'self'              — same-origin (wallet.html's inline + same-site .js)
+  #   'unsafe-inline'     — required: every page has inline <script> blocks
+  #   cdn.jsdelivr.net    — Supabase JS client library
+  #   js.stripe.com       — Stripe.js
+  # style-src             — CSS sources
+  #   'self' 'unsafe-inline' — every page has inline <style> + style="..." attrs
+  #   fonts.googleapis.com — Google Fonts stylesheets
+  # font-src              — font files
+  #   fonts.gstatic.com   — Google Fonts files
+  #   data:               — base64-embedded fonts (none currently, allow defensively)
+  # img-src               — image sources (avatars, KYC photos, QR codes, etc.)
+  #   'self' data: blob:  — same-origin, inline data URIs, blob URLs from createObjectURL
+  #   aqskltkvqlhcqwortjio.supabase.co — Supabase storage (avatars, KYC, property photos)
+  #   api.qrserver.com    — generated QR codes
+  #   images.unsplash.com — sample property photos in travel
+  #   villascabos.com     — third-party host's photos referenced in travel
+  # connect-src           — fetch/XHR/WebSocket destinations
+  #   'self'              — same-origin (Netlify functions)
+  #   *.tapat.dev         — cross-subdomain (wallet → marketplace, etc.)
+  #   aqskltkvqlhcqwortjio.supabase.co — Supabase REST API
+  #   wss://aqskltkvqlhcqwortjio.supabase.co — Supabase realtime (chat, etc.)
+  #   api.stripe.com      — Stripe API calls from client
+  #   api.exchangerate-api.com — FX rates (Travel pricing)
+  #   nominatim.openstreetmap.org — geocoding (Marketplace location field)
+  # frame-src             — embedded iframes
+  #   js.stripe.com hooks.stripe.com — Stripe Elements + 3DS
+  # frame-ancestors       — who can iframe US (clickjacking defense)
+  #   'self'              — only same-origin parents (drops to 'none' if no in-app iframes)
+  # object-src 'none'     — no Flash/applets
+  # base-uri 'self'       — <base> tag can only point to same-origin
+  # form-action 'self'    — forms can only submit to same-origin
+  # upgrade-insecure-requests — auto-upgrade any http:// references to https://
+  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://aqskltkvqlhcqwortjio.supabase.co https://api.qrserver.com https://images.unsplash.com https://villascabos.com; connect-src 'self' https://*.tapat.dev https://aqskltkvqlhcqwortjio.supabase.co wss://aqskltkvqlhcqwortjio.supabase.co https://api.stripe.com https://api.exchangerate-api.com https://nominatim.openstreetmap.org; frame-src https://js.stripe.com https://hooks.stripe.com; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests
+
+  # ── Companion hardening headers (always-on, not gated by Report-Only) ──
+  # Block MIME-type sniffing — prevents some XSS via mistyped uploads
+  X-Content-Type-Options: nosniff
+  # Limit referrer info leaked when navigating to other sites
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Disable browser features we don't use (USB, magnetometer, etc.)
+  # Allow self-origin for camera (KYC selfie, QR scan, photo uploads),
+  # microphone (future voice notes), geolocation (marketplace + travel).
+  # Allow Stripe iframe access to the Payment Request API.
+  # camera=(self) allows KYC selfie + QR scanning + photo uploads
+  # microphone=(self) reserved for future voice notes in chat
+  # geolocation=(self) for marketplace location + travel search radius
+  Permissions-Policy: accelerometer=(), camera=(self), microphone=(self), geolocation=(self), payment=(self "https://js.stripe.com"), usb=(), magnetometer=(), gyroscope=()
+  # Clickjacking belt — frame-ancestors above is the modern equivalent, this
+  # is the legacy header that older browsers honor
+  X-Frame-Options: SAMEORIGIN
+  # HSTS — tell browsers to use HTTPS for 1 year. Only safe when we're
+  # confident every TΛPΛT subdomain serves HTTPS (Cloudflare ensures this).
+  # `includeSubDomains` covers wallet/marketplace/shops/travel/etc.
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
