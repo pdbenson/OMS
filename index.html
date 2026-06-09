@@ -201,6 +201,21 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
 </div>
 
 
+<div class="overlay hidden" id="editEmailOverlay">
+  <div class="mbox" style="max-width:460px">
+    <h3>Edit Patient Email</h3>
+    <p id="editEmailSub" style="font-size:.85rem;color:var(--lt)"></p>
+    <div class="fd full" style="margin-bottom:12px"><label class="lbl">Email Address <span class="req">*</span></label><input type="email" class="inp" id="editEmailInput" placeholder="patient@example.com" onkeypress="if(event.key==='Enter')saveEditEmail()"></div>
+    <p style="font-size:.74rem;color:var(--lt);margin-bottom:10px">The patient will use this new address to access their forms. Invitations and reminders will go to it from now on.</p>
+    <div id="editEmailErr" class="alert ae hidden"></div>
+    <div class="modal-btns">
+      <button class="btn bS" onclick="closeEditEmailModal()">Cancel</button>
+      <button class="btn bP" id="editEmailSaveBtn" onclick="saveEditEmail()">Save Email</button>
+    </div>
+  </div>
+</div>
+
+
 <div class="overlay hidden" id="newPatientOverlay">
   <div class="mbox" style="max-width:520px">
     <h3>Invite New Patient</h3>
@@ -1095,7 +1110,7 @@ function buildPatientRow(p,done,isDraft,ed,ca,mode){
   return '<tr>'
     +'<td><strong>'+(p.firstName||'&mdash;')+'</strong></td>'
     +'<td><strong>'+(p.lastName||'&mdash;')+'</strong></td>'
-    +'<td style="font-size:.78rem;color:var(--lt)">'+p.email+'</td>'
+    +'<td style="font-size:.78rem;color:var(--lt)"><span style="cursor:pointer;border-bottom:1px dashed var(--bdr)" title="Click to edit email" onclick="openEditEmailModal(\''+pid+'\')">'+p.email+' &#x270E;</span></td>'
     +fmtApptCell(p)
     +'<td>'+(done.map(d=>'<span class="bdg bd">'+d+'</span>').join(' ')||'<span class="bdg" style="background:#eee;color:#999">None</span>')+isDraft+(p.intakeCompleteAt?' <span class="bdg" style="background:#e7f6ee;color:#2e8b57">&#x2713; Intake Complete</span>':'')+'</td>'
     +'<td>'+(p.completedAt?new Date(p.completedAt).toLocaleDateString():'&mdash;')+'</td>'
@@ -1120,6 +1135,34 @@ function splitPatients(patients){
     return an<bn?-1:an>bn?1:0;
   });
   return {onboarding,seen};
+}
+let _editEmailPid=null;
+function openEditEmailModal(pid){
+  if(!checkAnyAuth())return;
+  const _p=_adminPatientCache[pid]||_staffPatientCache[pid]||{};
+  _editEmailPid=pid;
+  document.getElementById('editEmailSub').textContent=((_p.firstName||'')+' '+(_p.lastName||'')).trim()||'Patient';
+  document.getElementById('editEmailInput').value=_p.email||'';
+  hideErr('editEmailErr');
+  document.getElementById('editEmailOverlay').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('editEmailInput').focus(),60);
+}
+function closeEditEmailModal(){document.getElementById('editEmailOverlay').classList.add('hidden');_editEmailPid=null;}
+async function saveEditEmail(){
+  if(!checkAnyAuth()||!_editEmailPid)return;
+  const email=document.getElementById('editEmailInput').value.trim().toLowerCase();
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showErr('editEmailErr','A valid email address is required.');return;}
+  const btn=document.getElementById('editEmailSaveBtn');
+  btn.disabled=true;btn.textContent='Saving...';
+  try{
+    await apiPost('admin-update-email',{patientId:_editEmailPid,email},activeToken());
+    btn.disabled=false;btn.textContent='Save Email';
+    closeEditEmailModal();toast('Email updated.');
+    if(adminToken&&Date.now()<adminTokenExpiry){loadDash();}else{loadStaffDash();}
+  }catch(e){
+    btn.disabled=false;btn.textContent='Save Email';
+    showErr('editEmailErr',e.message||'Could not update email.');
+  }
 }
 async function markIntakeComplete(pid,complete){
   if(!checkAnyAuth())return;
@@ -1555,7 +1598,7 @@ async function loadStaffDash(){
       return'<tr>'
         +'<td><strong>'+(p.firstName||'&mdash;')+'</strong></td>'
         +'<td><strong>'+(p.lastName||'&mdash;')+'</strong></td>'
-        +'<td style="font-size:.78rem;color:var(--lt)">'+p.email+'</td>'
+        +'<td style="font-size:.78rem;color:var(--lt)"><span style="cursor:pointer;border-bottom:1px dashed var(--bdr)" title="Click to edit email" onclick="openEditEmailModal(\''+p.id+'\')">'+p.email+' &#x270E;</span></td>'
         +fmtApptCell(p)
         +'<td>'+(done.map(d=>'<span class="bdg bd">'+d+'</span>').join(' ')||'<span class="bdg" style="background:#eee;color:#999">None</span>')+isDraft+(p.intakeCompleteAt?' <span class="bdg" style="background:#e7f6ee;color:#2e8b57">&#x2713; Intake Complete</span>':'')+'</td>'
         +'<td>'+(p.completedAt?new Date(p.completedAt).toLocaleDateString():'&mdash;')+'</td>'
