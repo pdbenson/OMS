@@ -13,8 +13,9 @@ exports.handler = async (event) => {
   let body;
   try { body = JSON.parse(event.body || '{}'); } catch { return badRequest('Invalid JSON'); }
 
-  const { firstName, lastName, email, phone } = body;
+  const { firstName, lastName, email, phone, apptDate, apptTime, dayStr, timeStr } = body;
   if (!firstName || !lastName || !email) return badRequest('firstName, lastName, and email are required');
+  if (!apptDate || !apptTime || !dayStr || !timeStr) return badRequest('Appointment date and time are required');
 
   const siteUrl   = process.env.SITE_URL || 'https://oms.tapat.dev';
   const actorEmail = actor.email || process.env.ADMIN_EMAIL;
@@ -28,7 +29,10 @@ exports.handler = async (event) => {
         first_name: firstName,
         last_name: lastName,
         phone: phone || null,
+        appointment_date: apptDate,
+        appointment_time: apptTime,
         status: 'invited',
+        invited_at: new Date().toISOString(),
         last_activity: new Date().toISOString(),
       }, { onConflict: 'email', ignoreDuplicates: false });
 
@@ -38,7 +42,7 @@ exports.handler = async (event) => {
       console.log('[invite-patient] *** NEW PATIENT INVITE ***');
       console.log('[invite-patient] To:', email, '| Name:', firstName, lastName);
       console.log('[invite-patient] SMTP not configured — set SMTP env vars to send email');
-      await logAudit('patient_invited_no_smtp', actorEmail, email, { firstName, lastName, phone }, event);
+      await logAudit('patient_invited_no_smtp', actorEmail, email, { firstName, lastName, phone, apptDate, apptTime }, event);
       return ok({ sent: false, queued: true, message: 'Patient record created. Email not sent — SMTP not configured.' });
     }
 
@@ -49,7 +53,7 @@ exports.handler = async (event) => {
       auth:   { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
     });
 
-    const subject = `Welcome to Davis Center for Oral and Maxillofacial Surgery — Complete Your Preregistration`;
+    const subject = `Welcome to Davis Center for Oral and Maxillofacial Surgery — Your Appointment on ${dayStr}`;
 
     const htmlBody = `<!DOCTYPE html>
 <html>
@@ -65,10 +69,18 @@ exports.handler = async (event) => {
         <div style="font-size:.85rem;color:rgba(255,255,255,.7);margin-top:4px;font-style:italic">Paul Benson, DMD, MD</div>
       </td></tr>
 
+      <!-- APPOINTMENT BANNER -->
+      <tr><td style="background:#3A7CA5;padding:16px 32px;text-align:center">
+        <div style="font-size:.78rem;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Your Upcoming Appointment</div>
+        <div style="font-size:1.15rem;font-weight:700;color:#ffffff">${dayStr}</div>
+        <div style="font-size:1rem;color:rgba(255,255,255,.9)">${timeStr}</div>
+        <div style="font-size:.82rem;color:rgba(255,255,255,.85);margin-top:8px;line-height:1.5">890 W. Heritage Park Blvd., Suite 103<br>Layton, Utah 84041 &middot; (801) 614-0999</div>
+      </td></tr>
+
       <!-- BODY -->
       <tr><td style="padding:32px 32px 24px">
         <p style="margin:0 0 16px;font-size:.95rem">Dear <strong>${firstName}</strong>,</p>
-        <p style="margin:0 0 16px;font-size:.95rem;line-height:1.6">Welcome to Davis Center for Oral and Maxillofacial Surgery. We're looking forward to providing you with exceptional care.</p>
+        <p style="margin:0 0 16px;font-size:.95rem;line-height:1.6">Welcome to Davis Center for Oral and Maxillofacial Surgery. We look forward to seeing you on <strong>${dayStr} at ${timeStr}</strong>.</p>
         <p style="margin:0 0 20px;font-size:.95rem;line-height:1.6">To prepare for your upcoming visit, we invite you to complete your patient preregistration online at your convenience. It takes about 10&ndash;15 minutes and can be done from any device.</p>
 
         <!-- CTA BUTTON -->
@@ -121,7 +133,7 @@ exports.handler = async (event) => {
 </body>
 </html>`;
 
-    const textBody = `Dear ${firstName},\n\nWelcome to Davis Center for Oral and Maxillofacial Surgery. We're looking forward to providing you with exceptional care.\n\nTo prepare for your upcoming visit, please complete your patient preregistration at: ${siteUrl}?action=preregister\n\nDuring preregistration you will complete:\n- Patient information & contact details\n- Insurance information\n- Health history\n- HIPAA Privacy Notice acknowledgment\n\nIf you have any questions, please call us at (801) 614-0999.\n\nWarm regards,\nDavis Center for Oral and Maxillofacial Surgery\nPaul Benson, DMD, MD\n890 W. Heritage Park Blvd., Suite 103 · Layton, Utah 84041\n(801) 614-0999 · info.davisoms@gmail.com`;
+    const textBody = `Dear ${firstName},\n\nWelcome to Davis Center for Oral and Maxillofacial Surgery. We look forward to seeing you on ${dayStr} at ${timeStr}.\n\nYour appointment:\n${dayStr} at ${timeStr}\n890 W. Heritage Park Blvd., Suite 103, Layton, Utah 84041\n(801) 614-0999\n\nTo prepare for your upcoming visit, please complete your patient preregistration at: ${siteUrl}?action=preregister\n\nDuring preregistration you will complete:\n- Patient information & contact details\n- Insurance information\n- Health history\n- HIPAA Privacy Notice acknowledgment\n\nIf you have any questions, please call us at (801) 614-0999.\n\nWarm regards,\nDavis Center for Oral and Maxillofacial Surgery\nPaul Benson, DMD, MD\n890 W. Heritage Park Blvd., Suite 103 · Layton, Utah 84041\n(801) 614-0999 · info.davisoms@gmail.com`;
 
     await transporter.sendMail({
       from: `"Davis Center for OMS" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
@@ -131,7 +143,7 @@ exports.handler = async (event) => {
       text: textBody,
     });
 
-    await logAudit('patient_invited', actorEmail, email, { firstName, lastName, phone }, event);
+    await logAudit('patient_invited', actorEmail, email, { firstName, lastName, phone, apptDate, apptTime }, event);
     return ok({ sent: true });
 
   } catch (e) {
