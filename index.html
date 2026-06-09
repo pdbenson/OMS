@@ -208,7 +208,9 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
     <div class="fg" style="margin-bottom:10px">
       <div class="fd"><label class="lbl">First Name <span class="req">*</span></label><input class="inp" id="np_first" placeholder="First name" onkeypress="if(event.key==='Enter')document.getElementById('np_last').focus()"></div>
       <div class="fd"><label class="lbl">Last Name <span class="req">*</span></label><input class="inp" id="np_last" placeholder="Last name" onkeypress="if(event.key==='Enter')document.getElementById('np_email').focus()"></div>
-      <div class="fd full"><label class="lbl">Email Address <span class="req">*</span></label><input type="email" class="inp" id="np_email" placeholder="patient@example.com" onkeypress="if(event.key==='Enter')document.getElementById('np_phone').focus()"></div>
+      <div class="fd full"><label class="lbl">Email Address <span class="req">*</span></label><input type="email" class="inp" id="np_email" placeholder="patient@example.com" onkeypress="if(event.key==='Enter')document.getElementById('np_appt_date').focus()"></div>
+      <div class="fd"><label class="lbl">Appointment Date <span class="req">*</span></label><input type="date" class="inp" id="np_appt_date"></div>
+      <div class="fd"><label class="lbl">Appointment Time <span class="req">*</span></label><input type="time" class="inp" id="np_appt_time"></div>
       <div class="fd full"><label class="lbl">Phone Number <small style="text-transform:none;font-weight:400;font-size:.85em">(for future SMS reminders)</small></label><input type="tel" class="inp" id="np_phone" placeholder="(801) 555-0000"></div>
     </div>
     <div id="npErr" class="alert ae hidden"></div>
@@ -450,7 +452,7 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
     </div>
     <div class="tblwrap">
       <table class="ptbl">
-        <thead><tr><th>First Name</th><th>Last Name</th><th>Email</th><th>Forms Completed</th><th>Date Completed</th><th>Last Activity</th><th>Ed.</th><th>Actions</th></tr></thead>
+        <thead><tr><th>First Name</th><th>Last Name</th><th>Email</th><th>Appointment</th><th>Forms Completed</th><th>Date Completed</th><th>Last Activity</th><th>Ed.</th><th>Actions</th></tr></thead>
         <tbody id="ptblBody"></tbody>
       </table>
     </div>
@@ -517,7 +519,7 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
     </div>
     <div class="tblwrap">
       <table class="ptbl">
-        <thead><tr><th>First Name</th><th>Last Name</th><th>Email</th><th>Forms Completed</th><th>Date Completed</th><th>Last Activity</th><th>Ed.</th><th>Actions</th></tr></thead>
+        <thead><tr><th>First Name</th><th>Last Name</th><th>Email</th><th>Appointment</th><th>Forms Completed</th><th>Date Completed</th><th>Last Activity</th><th>Ed.</th><th>Actions</th></tr></thead>
         <tbody id="staffPtblBody"></tbody>
       </table>
     </div>
@@ -1072,6 +1074,7 @@ function buildPatientRow(p,done,isDraft,ed,ca){
     +'<td><strong>'+(p.firstName||'&mdash;')+'</strong></td>'
     +'<td><strong>'+(p.lastName||'&mdash;')+'</strong></td>'
     +'<td style="font-size:.78rem;color:var(--lt)">'+p.email+'</td>'
+    +fmtApptCell(p)
     +'<td>'+(done.map(d=>'<span class="bdg bd">'+d+'</span>').join(' ')||'<span class="bdg" style="background:#eee;color:#999">None</span>')+isDraft+'</td>'
     +'<td>'+(p.completedAt?new Date(p.completedAt).toLocaleDateString():'&mdash;')+'</td>'
     +'<td>'+(p.lastActivity?new Date(p.lastActivity).toLocaleDateString():'&mdash;')+'</td>'
@@ -1079,7 +1082,9 @@ function buildPatientRow(p,done,isDraft,ed,ca){
     +td+'</tr>';
 }
 
-function filterPtTable(inpId,bodyId){const el=document.getElementById(inpId);const q=(el&&el.value||'').trim().toLowerCase();document.querySelectorAll('#'+bodyId+' tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length<2)return;const name=(tds[0].textContent+' '+tds[1].textContent).toLowerCase();tr.style.display=(!q||name.indexOf(q)!==-1)?'':'none';});}
+function apptKey(p){if(!p.appointmentDate)return'9999-12-31T23:59';return p.appointmentDate+'T'+((p.appointmentTime||'23:59').slice(0,5));}
+function fmtApptCell(p){if(!p.appointmentDate)return'<td data-appt="">&mdash;</td>';const t=(p.appointmentTime||'').slice(0,5);const d=new Date(p.appointmentDate+'T'+(t||'12:00'));const ds=isNaN(d)?p.appointmentDate:d.toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'2-digit'});const ts=t?d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true}):'';return'<td data-appt="'+p.appointmentDate+'" style="white-space:nowrap"><strong>'+ds+'</strong>'+(ts?' <span style="color:var(--lt)">&middot; '+ts+'</span>':'')+'</td>';}
+function filterPtTable(inpId,bodyId){const el=document.getElementById(inpId);const q=(el&&el.value||'').trim().toLowerCase();document.querySelectorAll('#'+bodyId+' tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length<2)return;const hay=(tds[0].textContent+' '+tds[1].textContent+' '+(tds[3]?tds[3].textContent+' '+(tds[3].getAttribute('data-appt')||''):'')).toLowerCase();tr.style.display=(!q||hay.indexOf(q)!==-1)?'':'none';});}
 async function loadDash(){
   if(!checkAdminAuth())return;
   setLoading(true,'Loading patients...');
@@ -1089,6 +1094,7 @@ async function loadDash(){
     document.getElementById('ptCount').textContent=patients.length+' patient'+(patients.length!==1?'s':'');
     document.getElementById('noPatients').classList.toggle('hidden',patients.length>0);
     const LBLS={pi:'Patient Info',ins:'Insurance',hh:'Health History',hipaa:'HIPAA'};
+    patients.sort((a,b)=>apptKey(a)<apptKey(b)?-1:apptKey(a)>apptKey(b)?1:0);
     document.getElementById('ptblBody').innerHTML=patients.map(p=>{
       const done=Object.entries(p.forms||{}).filter(([,f])=>f.done).map(([k])=>LBLS[k]);
       const ed=p.editionNumber>1?' <span class="bdg" style="background:#f0f0f0;color:#666">Ed.'+p.editionNumber+'</span>':'';
@@ -1228,15 +1234,15 @@ let reminderTarget={id:'',firstName:'',email:'',apptDate:'',apptTime:'',dayStr:'
 function openReminderModal(pid){
   const _p=_adminPatientCache[pid]||{};
   const firstName=_p.firstName||'', email=_p.email||'', existingAppt=_p.appointmentDate||'';
-  // Parse stored "YYYY-MM-DDTHH:MM" — split on T for date and time
-  const [storedDate='', storedTime=''] = existingAppt.includes('T') ? existingAppt.split('T') : [existingAppt, ''];
+  // Date may arrive bare ("YYYY-MM-DD") or legacy-concatenated ("YYYY-MM-DDTHH:MM"); time arrives separately
+  const [storedDate='', legacyTime=''] = existingAppt.includes('T') ? existingAppt.split('T') : [existingAppt, ''];
+  const storedTime=(_p.appointmentTime||legacyTime||'').slice(0,5);
   reminderTarget={id:pid,firstName:firstName,email:email,apptDate:storedDate,apptTime:storedTime,dayStr:'',timeStr:''};
   document.getElementById('reminderApptSub').textContent='Sending reminder to '+firstName+' ('+email+'). Enter their upcoming appointment details.';
   const dateEl=document.getElementById('reminderApptDate');
   const timeEl=document.getElementById('reminderApptTime');
   dateEl.value=storedDate||'';
   timeEl.value=storedTime||'';
-  timeEl.value='';
   hideErr('reminderApptErr');
   document.getElementById('reminderApptOverlay').classList.remove('hidden');
 }
@@ -1322,24 +1328,31 @@ function closeNewPatientModal(){
   document.getElementById('newPatientOverlay').classList.add('hidden');
 }
 async function sendNewPatientInvite(){
-  if(!checkAdminAuth())return;
+  if(!checkAnyAuth())return;
   const firstName=document.getElementById('np_first').value.trim();
   const lastName=document.getElementById('np_last').value.trim();
   const email=document.getElementById('np_email').value.trim().toLowerCase();
   const phone=document.getElementById('np_phone').value.trim();
+  const apptDate=document.getElementById('np_appt_date').value;
+  const apptTime=document.getElementById('np_appt_time').value;
   document.getElementById('npErr').classList.add('hidden');
   document.getElementById('npOk').classList.add('hidden');
   if(!firstName){showErr('npErr','First name is required.');return;}
   if(!lastName){showErr('npErr','Last name is required.');return;}
   if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showErr('npErr','A valid email address is required.');return;}
+  if(!apptDate){showErr('npErr','Appointment date is required.');return;}
+  if(!apptTime){showErr('npErr','Appointment time is required.');return;}
+  const apptDt=new Date(apptDate+'T'+apptTime);
+  const dayStr=apptDt.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const timeStr=apptDt.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
   const btn=document.getElementById('npSendBtn');
   btn.disabled=true; btn.textContent='Sending...';
   try{
-    await apiPost('invite-patient',{firstName,lastName,email,phone},activeToken());
+    await apiPost('invite-patient',{firstName,lastName,email,phone,apptDate,apptTime,dayStr,timeStr},activeToken());
     btn.textContent='✓ Sent';
     document.getElementById('npOk').textContent='Invitation sent successfully to '+email;
     document.getElementById('npOk').classList.remove('hidden');
-    setTimeout(()=>{closeNewPatientModal();loadDash();},2200);
+    setTimeout(()=>{closeNewPatientModal();if(adminToken&&Date.now()<adminTokenExpiry){loadDash();}else{loadStaffDash();}},2200);
   }catch(e){
     btn.disabled=false; btn.textContent='✉ Send Invitation';
     showErr('npErr',e.message||'Failed to send invitation. Please try again.');
@@ -1477,6 +1490,7 @@ async function loadStaffDash(){
     document.getElementById('staffPtCount').textContent=patients.length+' patient'+(patients.length!==1?'s':'');
     document.getElementById('staffNoPatients').classList.toggle('hidden',patients.length>0);
     const LBLS={pi:'Patient Info',ins:'Insurance',hh:'Health History',hipaa:'HIPAA'};
+    patients.sort((a,b)=>apptKey(a)<apptKey(b)?-1:apptKey(a)>apptKey(b)?1:0);
     document.getElementById('staffPtblBody').innerHTML=patients.map(p=>{
       _staffPatientCache[p.id]=p;
       const done=Object.entries(p.forms||{}).filter(([,f])=>f.done).map(([k])=>LBLS[k]);
@@ -1486,6 +1500,7 @@ async function loadStaffDash(){
         +'<td><strong>'+(p.firstName||'&mdash;')+'</strong></td>'
         +'<td><strong>'+(p.lastName||'&mdash;')+'</strong></td>'
         +'<td style="font-size:.78rem;color:var(--lt)">'+p.email+'</td>'
+        +fmtApptCell(p)
         +'<td>'+(done.map(d=>'<span class="bdg bd">'+d+'</span>').join(' ')||'<span class="bdg" style="background:#eee;color:#999">None</span>')+isDraft+'</td>'
         +'<td>'+(p.completedAt?new Date(p.completedAt).toLocaleDateString():'&mdash;')+'</td>'
         +'<td>'+(p.lastActivity?new Date(p.lastActivity).toLocaleDateString():'&mdash;')+'</td>'
