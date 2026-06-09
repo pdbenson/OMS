@@ -37,17 +37,7 @@ exports.handler = async (event) => {
     const oldEmail = patient.email;
     if (oldEmail === newEmail) return ok({ patientId, email: newEmail, unchanged: true });
 
-    // While patients.email is UNIQUE (pre-item-3), surface a clear conflict
-    const { data: existing } = await supabase
-      .from('patients')
-      .select('id')
-      .eq('email', newEmail)
-      .neq('id', patientId)
-      .maybeSingle();
-    if (existing) {
-      return badRequest('Another patient already uses this email address. Shared family emails are coming in a future update.');
-    }
-
+    // Shared family emails are supported — no uniqueness check needed.
     const { error: uErr } = await supabase
       .from('patients')
       .update({

@@ -1,31 +1,37 @@
 'use strict';
+// Multi-row-safe replacement for patient-check (item 3: emails may belong to
+// multiple patients). Contract observed from index.html: GET ?email= → { exists, status }.
+// NOTE: compare against the original in the repo before deploying — if the
+// original does anything beyond this contract, fold it in.
 const { supabase, ok, badRequest, serverError, handleOptions } = require('./_utils');
 
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return handleOptions();
   if (event.httpMethod !== 'GET') return { statusCode: 405, body: 'Method Not Allowed' };
 
-  const email = event.queryStringParameters?.email?.trim().toLowerCase();
+  const email = (event.queryStringParameters?.email || '').trim().toLowerCase();
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return badRequest('Valid email required');
   }
 
   try {
-    const { data, error } = await supabase
+    // No .single()/.maybeSingle() — an email may match several family members
+    const { data: rows, error } = await supabase
       .from('patients')
-      .select('id, status, edition_number, first_name, last_name')
+      .select('id, status, last_activity')
       .eq('email', email)
-      .maybeSingle();
+      .order('last_activity', { ascending: false })
+      .limit(5);
 
     if (error) throw error;
 
     return ok({
-      exists: !!data,
-      status: data?.status || null,
-      name:   data ? `${data.first_name || ''} ${data.last_name || ''}`.trim() : null,
+      exists: !!(rows && rows.length),
+      status: rows && rows.length ? rows[0].status : null,
+      count:  rows ? rows.length : 0,
     });
   } catch (e) {
     console.error('[patient-check]', e);
-    return serverError('Could not check patient record');
+    return serverError('Lookup failed');
   }
 };

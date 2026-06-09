@@ -20,12 +20,29 @@ exports.handler = async (event) => {
   const siteUrl   = process.env.SITE_URL || 'https://oms.tapat.dev';
   const actorEmail = actor.email || process.env.ADMIN_EMAIL;
 
+  const cleanEmail = email.toLowerCase().trim();
+
   try {
-    // Create a draft patient record so they appear in the dashboard
+    // Multiple patients may share an email (family members). Guard only against
+    // inviting the *same person* twice: identical name on the same email.
+    const { data: dupes, error: dupErr } = await supabase
+      .from('patients')
+      .select('id, first_name, last_name')
+      .eq('email', cleanEmail);
+    if (dupErr) throw dupErr;
+    const sameName = (dupes || []).find(d =>
+      (d.first_name || '').trim().toLowerCase() === firstName.trim().toLowerCase() &&
+      (d.last_name  || '').trim().toLowerCase() === lastName.trim().toLowerCase()
+    );
+    if (sameName) {
+      return badRequest(`A patient named ${firstName} ${lastName} already exists with this email. Use the Remind button to resend their invitation instead.`);
+    }
+
+    // Always INSERT — never overwrite an existing family member's record
     const { error: dbErr } = await supabase
       .from('patients')
-      .upsert({
-        email: email.toLowerCase().trim(),
+      .insert({
+        email: cleanEmail,
         first_name: firstName,
         last_name: lastName,
         phone: phone || null,
@@ -34,9 +51,9 @@ exports.handler = async (event) => {
         status: 'invited',
         invited_at: new Date().toISOString(),
         last_activity: new Date().toISOString(),
-      }, { onConflict: 'email', ignoreDuplicates: false });
+      });
 
-    if (dbErr) console.error('[invite-patient] DB upsert warning:', dbErr.message);
+    if (dbErr) throw dbErr;
 
     if (!process.env.SMTP_HOST) {
       console.log('[invite-patient] *** NEW PATIENT INVITE ***');

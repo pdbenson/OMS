@@ -14,14 +14,10 @@ exports.handler = async (event) => {
   }
 
   try {
-    // Check patient doesn't already exist
-    const { data: existing } = await supabase
-      .from('patients')
-      .select('id')
-      .eq('email', email)
-      .maybeSingle();
-
-    if (existing) return badRequest('Patient already exists — use verify endpoint');
+    // Multiple patients may share an email (family members) — creating a new
+    // record alongside existing ones is allowed. The frontend routes returning
+    // patients through patient-verify; this path is reached for brand-new emails
+    // or via the explicit "register a new patient with this email" option.
 
     // Create new patient record
     const { data: patient, error } = await supabase
