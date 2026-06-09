@@ -444,19 +444,28 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
       <div style="font-size:.9rem;color:var(--lt)">Patient preregistration records</div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <input class="inp" id="ptSearch" placeholder="Search first or last name&hellip;" style="max-width:230px;padding:8px 12px;font-size:.84rem" oninput="filterPtTable('ptSearch','ptblBody')">
+        <input class="inp" id="ptSearch" placeholder="Search first or last name&hellip;" style="max-width:230px;padding:8px 12px;font-size:.84rem" oninput="filterPtTable('ptSearch','ptblBody');filterPtTable('ptSearch','ptblBody2')">
         <button class="btn bG" style="display:flex;align-items:center;gap:7px" onclick="openNewPatientModal()">
           <span style="font-size:1.1rem;font-weight:400">&#xFF0B;</span> New Patient Invite
         </button>
       </div>
     </div>
+    <div style="font-size:.78rem;font-weight:700;color:var(--sec);text-transform:uppercase;letter-spacing:.06em;margin:4px 0 8px">Onboarding <span id="onboardCount" style="font-weight:400;text-transform:none;color:var(--lt)"></span></div>
     <div class="tblwrap">
       <table class="ptbl">
         <thead><tr><th>First Name</th><th>Last Name</th><th>Email</th><th>Appointment</th><th>Forms Completed</th><th>Date Completed</th><th>Last Activity</th><th>Ed.</th><th>Actions</th></tr></thead>
         <tbody id="ptblBody"></tbody>
       </table>
     </div>
-    <div id="noPatients" class="alert ai hidden" style="margin-top:18px">No patient records found yet.</div>
+    <div id="noPatients" class="alert ai hidden" style="margin-top:10px">No patients currently onboarding.</div>
+    <div style="font-size:.78rem;font-weight:700;color:var(--sec);text-transform:uppercase;letter-spacing:.06em;margin:26px 0 8px">Seen &amp; Completed Patients <span id="seenCount" style="font-weight:400;text-transform:none;color:var(--lt)"></span></div>
+    <div class="tblwrap">
+      <table class="ptbl">
+        <thead><tr><th>First Name</th><th>Last Name</th><th>Email</th><th>Appointment</th><th>Forms Completed</th><th>Date Completed</th><th>Last Activity</th><th>Ed.</th><th>Actions</th></tr></thead>
+        <tbody id="ptblBody2"></tbody>
+      </table>
+    </div>
+    <div id="noPatients2" class="alert ai hidden" style="margin-top:10px">No past or completed patients yet.</div>
     </div><!-- end tblwrap -->
     </div><!-- end adminPatientsPanel -->
 
@@ -511,19 +520,28 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
       <span style="font-size:.85rem;color:var(--lt)" id="staffPtCount"></span>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <input class="inp" id="staffPtSearch" placeholder="Search first or last name&hellip;" style="max-width:230px;padding:8px 12px;font-size:.84rem" oninput="filterPtTable('staffPtSearch','staffPtblBody')">
+        <input class="inp" id="staffPtSearch" placeholder="Search first or last name&hellip;" style="max-width:230px;padding:8px 12px;font-size:.84rem" oninput="filterPtTable('staffPtSearch','staffPtblBody');filterPtTable('staffPtSearch','staffPtblBody2')">
         <button class="btn bG" style="display:flex;align-items:center;gap:7px" onclick="openNewPatientModal()">
           <span style="font-size:1.1rem;font-weight:400">&#xFF0B;</span> New Patient Invite
         </button>
       </div>
     </div>
+    <div style="font-size:.78rem;font-weight:700;color:var(--sec);text-transform:uppercase;letter-spacing:.06em;margin:4px 0 8px">Onboarding <span id="staffOnboardCount" style="font-weight:400;text-transform:none;color:var(--lt)"></span></div>
     <div class="tblwrap">
       <table class="ptbl">
         <thead><tr><th>First Name</th><th>Last Name</th><th>Email</th><th>Appointment</th><th>Forms Completed</th><th>Date Completed</th><th>Last Activity</th><th>Ed.</th><th>Actions</th></tr></thead>
         <tbody id="staffPtblBody"></tbody>
       </table>
     </div>
-    <div id="staffNoPatients" class="alert ai hidden" style="margin-top:18px">No patient records found yet.</div>
+    <div id="staffNoPatients" class="alert ai hidden" style="margin-top:10px">No patients currently onboarding.</div>
+    <div style="font-size:.78rem;font-weight:700;color:var(--sec);text-transform:uppercase;letter-spacing:.06em;margin:26px 0 8px">Seen &amp; Completed Patients <span id="staffSeenCount" style="font-weight:400;text-transform:none;color:var(--lt)"></span></div>
+    <div class="tblwrap">
+      <table class="ptbl">
+        <thead><tr><th>First Name</th><th>Last Name</th><th>Email</th><th>Appointment</th><th>Forms Completed</th><th>Date Completed</th><th>Last Activity</th><th>Ed.</th><th>Actions</th></tr></thead>
+        <tbody id="staffPtblBody2"></tbody>
+      </table>
+    </div>
+    <div id="staffNoPatients2" class="alert ai hidden" style="margin-top:10px">No past or completed patients yet.</div>
   </div>
   <div class="pgft">Davis Center for Oral and Maxillofacial Surgery &middot; 890 W Heritage Park Blvd, Suite 103 &middot; Layton, Utah 84041<br>(801) 614-0999 &middot; <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a></div>
 </div>
@@ -1062,20 +1080,24 @@ function activeToken(){
 }
 
 // ── ADMIN DASHBOARD ───────────────────────────────────────────────────
-function buildPatientRow(p,done,isDraft,ed,ca){
+function buildPatientRow(p,done,isDraft,ed,ca,mode){
   _adminPatientCache[p.id]=p;
   const pid=p.id;
+  const completeBtn=(mode==='seen')
+    ?'<button class="btn bS" style="padding:5px 10px;font-size:.75rem;margin-left:3px" onclick="markIntakeComplete(\''+pid+'\',false)">&#x21A9; Reopen</button>'
+    :'<button class="btn" style="padding:5px 10px;font-size:.75rem;background:#2e8b57;color:#fff;margin-left:3px" onclick="markIntakeComplete(\''+pid+'\',true)">&#x2713; Complete</button>';
   const td='<td style="white-space:nowrap">'
     +'<button class="btn bP" style="padding:5px 10px;font-size:.75rem" onclick="adminViewPt(\''+pid+'\')">View</button> '
     +'<button class="btn bA" style="padding:5px 10px;font-size:.75rem;margin-left:3px" onclick="openConsentModal(\''+pid+'\')">Forms'+(ca?' ('+ca+')':'')+'</button> '
     +'<button class="btn" style="padding:5px 10px;font-size:.75rem;background:#e67e22;color:#fff;margin-left:3px" onclick="openReminderModal(\''+pid+'\')">&#x1F514; Remind</button>'
+    +completeBtn
     +'</td>';
   return '<tr>'
     +'<td><strong>'+(p.firstName||'&mdash;')+'</strong></td>'
     +'<td><strong>'+(p.lastName||'&mdash;')+'</strong></td>'
     +'<td style="font-size:.78rem;color:var(--lt)">'+p.email+'</td>'
     +fmtApptCell(p)
-    +'<td>'+(done.map(d=>'<span class="bdg bd">'+d+'</span>').join(' ')||'<span class="bdg" style="background:#eee;color:#999">None</span>')+isDraft+'</td>'
+    +'<td>'+(done.map(d=>'<span class="bdg bd">'+d+'</span>').join(' ')||'<span class="bdg" style="background:#eee;color:#999">None</span>')+isDraft+(p.intakeCompleteAt?' <span class="bdg" style="background:#e7f6ee;color:#2e8b57">&#x2713; Intake Complete</span>':'')+'</td>'
     +'<td>'+(p.completedAt?new Date(p.completedAt).toLocaleDateString():'&mdash;')+'</td>'
     +'<td>'+(p.lastActivity?new Date(p.lastActivity).toLocaleDateString():'&mdash;')+'</td>'
     +'<td>'+(p.editionNumber>1?'Ed.'+p.editionNumber:'1')+ed+'</td>'
@@ -1083,6 +1105,32 @@ function buildPatientRow(p,done,isDraft,ed,ca){
 }
 
 function apptKey(p){if(!p.appointmentDate)return'9999-12-31T23:59';return p.appointmentDate+'T'+((p.appointmentTime||'23:59').slice(0,5));}
+function todayISO(){return new Date().toLocaleDateString('en-CA');}
+function isSeenPatient(p){return !!p.intakeCompleteAt||(p.appointmentDate&&p.appointmentDate<=todayISO());}
+function splitPatients(patients){
+  const onboarding=patients.filter(p=>!isSeenPatient(p));
+  const seen=patients.filter(isSeenPatient);
+  onboarding.sort((a,b)=>apptKey(a)<apptKey(b)?-1:apptKey(a)>apptKey(b)?1:0);
+  const t=todayISO();
+  seen.sort((a,b)=>{
+    const at=a.appointmentDate===t?0:1, bt=b.appointmentDate===t?0:1;
+    if(at!==bt)return at-bt;
+    if(at===0)return apptKey(a)<apptKey(b)?-1:apptKey(a)>apptKey(b)?1:0;
+    const an=((a.lastName||'')+' '+(a.firstName||'')).toLowerCase(), bn=((b.lastName||'')+' '+(b.firstName||'')).toLowerCase();
+    return an<bn?-1:an>bn?1:0;
+  });
+  return {onboarding,seen};
+}
+async function markIntakeComplete(pid,complete){
+  if(!checkAnyAuth())return;
+  if(!confirm(complete?'Mark this patient\'s intake as complete? They will move to the Seen & Completed list.':'Reopen this patient\'s intake? They will move back to Onboarding if their appointment is in the future.'))return;
+  setLoading(true,'Updating...');
+  try{
+    await apiPost('admin-mark-complete',{patientId:pid,complete},activeToken());
+    setLoading(false);toast(complete?'Intake marked complete.':'Intake reopened.');
+    if(adminToken&&Date.now()<adminTokenExpiry){loadDash();}else{loadStaffDash();}
+  }catch(e){setLoading(false);toast('Could not update: '+e.message);}
+}
 function fmtApptCell(p){if(!p.appointmentDate)return'<td data-appt="">&mdash;</td>';const t=(p.appointmentTime||'').slice(0,5);const d=new Date(p.appointmentDate+'T'+(t||'12:00'));const ds=isNaN(d)?p.appointmentDate:d.toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'2-digit'});const ts=t?d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true}):'';return'<td data-appt="'+p.appointmentDate+'" style="white-space:nowrap"><strong>'+ds+'</strong>'+(ts?' <span style="color:var(--lt)">&middot; '+ts+'</span>':'')+'</td>';}
 function filterPtTable(inpId,bodyId){const el=document.getElementById(inpId);const q=(el&&el.value||'').trim().toLowerCase();document.querySelectorAll('#'+bodyId+' tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length<2)return;const hay=(tds[0].textContent+' '+tds[1].textContent+' '+(tds[3]?tds[3].textContent+' '+(tds[3].getAttribute('data-appt')||''):'')).toLowerCase();tr.style.display=(!q||hay.indexOf(q)!==-1)?'':'none';});}
 async function loadDash(){
@@ -1092,17 +1140,23 @@ async function loadDash(){
     const {patients}=await apiGet('admin-patients',{},adminToken);
     setLoading(false);
     document.getElementById('ptCount').textContent=patients.length+' patient'+(patients.length!==1?'s':'');
-    document.getElementById('noPatients').classList.toggle('hidden',patients.length>0);
     const LBLS={pi:'Patient Info',ins:'Insurance',hh:'Health History',hipaa:'HIPAA'};
-    patients.sort((a,b)=>apptKey(a)<apptKey(b)?-1:apptKey(a)>apptKey(b)?1:0);
-    document.getElementById('ptblBody').innerHTML=patients.map(p=>{
+    const {onboarding,seen}=splitPatients(patients);
+    const mkRow=(p,mode)=>{
       const done=Object.entries(p.forms||{}).filter(([,f])=>f.done).map(([k])=>LBLS[k]);
       const ed=p.editionNumber>1?' <span class="bdg" style="background:#f0f0f0;color:#666">Ed.'+p.editionNumber+'</span>':'';
       const isDraft=p.status==='draft'?' <span class="bdg" style="background:#f0f4ff;color:#3A7CA5">Draft</span>':'';
       const ca=(p.assignedConsents||[]).length;
-      return buildPatientRow(p,done,isDraft,ed,ca);
-    }).join('');
+      return buildPatientRow(p,done,isDraft,ed,ca,mode);
+    };
+    document.getElementById('ptblBody').innerHTML=onboarding.map(p=>mkRow(p,'onboard')).join('');
+    document.getElementById('ptblBody2').innerHTML=seen.map(p=>mkRow(p,'seen')).join('');
+    document.getElementById('noPatients').classList.toggle('hidden',onboarding.length>0);
+    document.getElementById('noPatients2').classList.toggle('hidden',seen.length>0);
+    document.getElementById('onboardCount').textContent='('+onboarding.length+')';
+    document.getElementById('seenCount').textContent='('+seen.length+')';
     filterPtTable('ptSearch','ptblBody');
+    filterPtTable('ptSearch','ptblBody2');
   }catch(e){setLoading(false);toast('Could not load patients: '+e.message);}
 }
 
@@ -1488,20 +1542,22 @@ async function loadStaffDash(){
     const {patients}=await apiGet('admin-patients',{},staffToken);
     setLoading(false);
     document.getElementById('staffPtCount').textContent=patients.length+' patient'+(patients.length!==1?'s':'');
-    document.getElementById('staffNoPatients').classList.toggle('hidden',patients.length>0);
     const LBLS={pi:'Patient Info',ins:'Insurance',hh:'Health History',hipaa:'HIPAA'};
-    patients.sort((a,b)=>apptKey(a)<apptKey(b)?-1:apptKey(a)>apptKey(b)?1:0);
-    document.getElementById('staffPtblBody').innerHTML=patients.map(p=>{
+    const {onboarding,seen}=splitPatients(patients);
+    const mkRow=(p,mode)=>{
       _staffPatientCache[p.id]=p;
       const done=Object.entries(p.forms||{}).filter(([,f])=>f.done).map(([k])=>LBLS[k]);
       const isDraft=p.status==='draft'?' <span class="bdg" style="background:#f0f4ff;color:#3A7CA5">Draft</span>':'';
       const ca=(p.assignedConsents||[]).length;
+      const completeBtn=(mode==='seen')
+        ?' <button class="btn bS" style="padding:5px 10px;font-size:.75rem;margin-left:3px" onclick="markIntakeComplete(\''+p.id+'\',false)">&#x21A9; Reopen</button>'
+        :' <button class="btn" style="padding:5px 10px;font-size:.75rem;background:#2e8b57;color:#fff;margin-left:3px" onclick="markIntakeComplete(\''+p.id+'\',true)">&#x2713; Complete</button>';
       return'<tr>'
         +'<td><strong>'+(p.firstName||'&mdash;')+'</strong></td>'
         +'<td><strong>'+(p.lastName||'&mdash;')+'</strong></td>'
         +'<td style="font-size:.78rem;color:var(--lt)">'+p.email+'</td>'
         +fmtApptCell(p)
-        +'<td>'+(done.map(d=>'<span class="bdg bd">'+d+'</span>').join(' ')||'<span class="bdg" style="background:#eee;color:#999">None</span>')+isDraft+'</td>'
+        +'<td>'+(done.map(d=>'<span class="bdg bd">'+d+'</span>').join(' ')||'<span class="bdg" style="background:#eee;color:#999">None</span>')+isDraft+(p.intakeCompleteAt?' <span class="bdg" style="background:#e7f6ee;color:#2e8b57">&#x2713; Intake Complete</span>':'')+'</td>'
         +'<td>'+(p.completedAt?new Date(p.completedAt).toLocaleDateString():'&mdash;')+'</td>'
         +'<td>'+(p.lastActivity?new Date(p.lastActivity).toLocaleDateString():'&mdash;')+'</td>'
         +'<td>'+(p.editionNumber>1?'Ed.'+p.editionNumber:'1')+'</td>'
@@ -1509,9 +1565,17 @@ async function loadStaffDash(){
         +'<button class="btn bP" style="padding:5px 10px;font-size:.75rem" onclick="staffViewPt(\''+p.id+'\')">View</button>'
         +' <button class="btn bA" style="padding:5px 10px;font-size:.75rem;margin-left:3px" onclick="staffConsentModal(\''+p.id+'\')">Forms'+(ca?' ('+ca+')':'')+'</button>'
         +' <button class="btn" style="padding:5px 10px;font-size:.75rem;background:#e67e22;color:#fff;margin-left:3px" onclick="openReminderModal(\''+p.id+'\')">&#x1F514; Remind</button>'
+        +completeBtn
         +'</td></tr>';
-    }).join('');
+    };
+    document.getElementById('staffPtblBody').innerHTML=onboarding.map(p=>mkRow(p,'onboard')).join('');
+    document.getElementById('staffPtblBody2').innerHTML=seen.map(p=>mkRow(p,'seen')).join('');
+    document.getElementById('staffNoPatients').classList.toggle('hidden',onboarding.length>0);
+    document.getElementById('staffNoPatients2').classList.toggle('hidden',seen.length>0);
+    document.getElementById('staffOnboardCount').textContent='('+onboarding.length+')';
+    document.getElementById('staffSeenCount').textContent='('+seen.length+')';
     filterPtTable('staffPtSearch','staffPtblBody');
+    filterPtTable('staffPtSearch','staffPtblBody2');
   }catch(e){setLoading(false);toast('Could not load patients: '+e.message);}
 }
 
