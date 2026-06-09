@@ -19,3 +19,6 @@
   [headers.values]
     Cache-Control = "no-store"
     Pragma = "no-cache"
+
+[functions."reminder-cron"]
+  schedule = "0 15 * * *"
