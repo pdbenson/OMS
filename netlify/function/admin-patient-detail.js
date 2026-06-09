@@ -14,8 +14,7 @@ exports.handler = async (event) => {
   const patientId = event.queryStringParameters?.patientId;
   if (!patientId) return badRequest('patientId required');
 
-  const caller2 = requireStaff(event)||{};
-  const adminEmail = caller2.email || process.env.ADMIN_EMAIL;
+  const adminEmail = caller.email || process.env.ADMIN_EMAIL;
 
   try {
     const { data: patient, error: pErr } = await supabase
@@ -74,6 +73,10 @@ exports.handler = async (event) => {
         completedAt:     patient.completed_at,
         assignedConsents: patient.assigned_consents || [],
         createdAt:       patient.created_at,
+        phone:           patient.phone || null,
+        appointmentDate: patient.appointment_date || null,
+        appointmentTime: patient.appointment_time || null,
+        intakeCompleteAt: patient.intake_complete_at || null,
       },
       currentForms: editions[patient.edition_number] || {},
       signatures:   sigMap,

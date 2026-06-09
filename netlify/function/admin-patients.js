@@ -11,12 +11,12 @@ exports.handler = async (event) => {
   const caller = requireStaff(event);
   if (!caller) return unauthorized();
 
-  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminEmail = caller.email || process.env.ADMIN_EMAIL;
 
   try {
     const { data: patients, error: pErr } = await supabase
       .from('patients')
-      .select('id, email, first_name, last_name, status, edition_number, last_activity, completed_at, assigned_consents, appointment_date')
+      .select('id, email, first_name, last_name, status, edition_number, last_activity, completed_at, assigned_consents, appointment_date, appointment_time, intake_complete_at')
       .order('last_activity', { ascending: false });
 
     if (pErr) throw pErr;
@@ -50,6 +50,8 @@ exports.handler = async (event) => {
       completedAt:     p.completed_at,
       assignedConsents: p.assigned_consents || [],
       appointmentDate: p.appointment_date || null,
+      appointmentTime: p.appointment_time || null,
+      intakeCompleteAt: p.intake_complete_at || null,
       forms:           formsByPatient[p.id] || {},
     }));
 
