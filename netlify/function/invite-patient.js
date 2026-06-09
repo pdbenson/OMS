@@ -1,12 +1,14 @@
 'use strict';
 const nodemailer = require('nodemailer');
-const { supabase, ok, badRequest, unauthorized, serverError, handleOptions, requireAdmin, logAudit } = require('./_utils');
+const { supabase, ok, badRequest, unauthorized, serverError, handleOptions, requireStaff, logAudit } = require('./_utils');
 
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return handleOptions();
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
 
-  if (!requireAdmin(event)) return unauthorized();
+  // All admin tiers (admin, provider, staff) may invite new patients
+  const actor = requireStaff(event);
+  if (!actor) return unauthorized();
 
   let body;
   try { body = JSON.parse(event.body || '{}'); } catch { return badRequest('Invalid JSON'); }
@@ -15,7 +17,7 @@ exports.handler = async (event) => {
   if (!firstName || !lastName || !email) return badRequest('firstName, lastName, and email are required');
 
   const siteUrl   = process.env.SITE_URL || 'https://oms.tapat.dev';
-  const adminEmail = process.env.ADMIN_EMAIL;
+  const actorEmail = actor.email || process.env.ADMIN_EMAIL;
 
   try {
     // Create a draft patient record so they appear in the dashboard
@@ -36,7 +38,7 @@ exports.handler = async (event) => {
       console.log('[invite-patient] *** NEW PATIENT INVITE ***');
       console.log('[invite-patient] To:', email, '| Name:', firstName, lastName);
       console.log('[invite-patient] SMTP not configured — set SMTP env vars to send email');
-      await logAudit('patient_invited_no_smtp', adminEmail, email, { firstName, lastName, phone }, event);
+      await logAudit('patient_invited_no_smtp', actorEmail, email, { firstName, lastName, phone }, event);
       return ok({ sent: false, queued: true, message: 'Patient record created. Email not sent — SMTP not configured.' });
     }
 
@@ -129,7 +131,7 @@ exports.handler = async (event) => {
       text: textBody,
     });
 
-    await logAudit('patient_invited', adminEmail, email, { firstName, lastName, phone }, event);
+    await logAudit('patient_invited', actorEmail, email, { firstName, lastName, phone }, event);
     return ok({ sent: true });
 
   } catch (e) {
