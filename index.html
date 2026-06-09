@@ -308,8 +308,13 @@ select.inp{cursor:pointer}textarea.inp{resize:vertical;min-height:76px}
       <div class="fd" style="margin-bottom:9px"><label class="lbl">Email</label><input class="inp" id="verifyEmail" readonly></div>
       <div class="fd" style="margin-bottom:14px"><label class="lbl">Date of Birth <span class="req">*</span></label><input type="date" class="inp" id="verifyDob" onkeypress="if(event.key==='Enter')doVerify()">
       <div style="margin-top:6px;font-size:.75rem;color:var(--lt)">Or type your date of birth: <input type="text" class="inp" id="verifyDobText" placeholder="MM/DD/YYYY" style="display:inline-block;width:140px;padding:5px 9px;font-size:.82rem;margin-left:6px" oninput="syncDobFromText(this.value)" onkeypress="if(event.key==='Enter')doVerify()"></div></div>
+      <div id="verifyPicker" class="hidden" style="margin-bottom:12px">
+        <div style="font-size:.85rem;color:var(--lt);margin-bottom:9px">More than one patient uses this email. Who is completing forms today?</div>
+        <div id="verifyPickerBtns" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
       <div id="verifyErr" class="alert ae hidden"></div>
-      <button class="btn bP" style="width:100%" onclick="doVerify()">Verify &amp; Continue &#8594;</button>
+      <div id="verifyNewPt" class="hidden" style="margin:0 0 12px;padding:10px 12px;background:var(--surf);border-radius:var(--r);font-size:.82rem;line-height:1.5">Registering a <strong>new patient</strong> who shares this email (a child or family member)? <button class="btn bS" style="padding:6px 12px;font-size:.78rem;margin-top:7px;display:block" onclick="startNewOnSharedEmail()">Start a New Patient Registration &#8594;</button></div>
+      <button class="btn bP" style="width:100%" id="verifyBtn" onclick="doVerify()">Verify &amp; Continue &#8594;</button>
     </div>
   </div>
   <div class="pgft">Davis Center for Oral and Maxillofacial Surgery &middot; 890 W Heritage Park Blvd, Suite 103 &middot; Layton, Utah 84041<br>(801) 614-0999 &middot; <a href="mailto:info.davisoms@gmail.com">info.davisoms@gmail.com</a><div class="pgft-nav"><a href="/hipaa-compliance.html" target="_blank">HIPAA Compliance</a><span class="pgft-sep">|</span><a href="/terms-privacy.html" target="_blank">Terms &amp; Privacy</a></div></div>
@@ -658,12 +663,16 @@ async function doEmail(){
       // Always verify for view mode
       document.getElementById('verifyEmail').value=em;
       document.getElementById('verifyDob').value='';
+      document.getElementById('verifyPicker').classList.add('hidden');
+      document.getElementById('verifyNewPt').classList.add('hidden');
       showV('vVerify');
     } else {
       if(exists){
         // Returning patient — verify identity before continuing
         document.getElementById('verifyEmail').value=em;
         document.getElementById('verifyDob').value='';
+        document.getElementById('verifyPicker').classList.add('hidden');
+        document.getElementById('verifyNewPt').classList.add('hidden');
         showV('vVerify');
       } else {
         // New patient — create record and start
@@ -727,15 +736,27 @@ function syncDobField(val,targetId){
 }
 
 // ── DOB VERIFY ─────────────────────────────────────────────────────────
-async function doVerify(){
+async function doVerify(selectedPid){
   const dob=document.getElementById('verifyDob').value;
   if(!dob){showErr('verifyErr','Date of birth is required.');return;}
   curDob=dob; // carry DOB forward to Step 1
   hideErr('verifyErr');
+  document.getElementById('verifyNewPt').classList.add('hidden');
   setLoading(true,'Verifying...');
   try {
-    const res = await apiPost('patient-verify',{email:curEmail, dob});
+    const payload={email:curEmail, dob};
+    if(selectedPid)payload.patientId=selectedPid;
+    const res = await apiPost('patient-verify',payload);
     setLoading(false);
+    if(res.needsSelection){
+      // Several patients match (shared email) — show the picker
+      const wrap=document.getElementById('verifyPicker');
+      const btns=document.getElementById('verifyPickerBtns');
+      btns.innerHTML=(res.options||[]).map(o=>'<button class="btn bS" style="width:100%;text-align:left;padding:11px 14px" onclick="doVerify(\''+o.patientId+'\')">'+escHtml(o.firstName)+(o.lastInitial?' '+escHtml(o.lastInitial)+'.':'')+'</button>').join('');
+      wrap.classList.remove('hidden');
+      return;
+    }
+    document.getElementById('verifyPicker').classList.add('hidden');
     patientToken=res.token; patientId=res.patientId;
     if(mode==='view'){
       setLoading(true,'Loading your forms...');
@@ -754,8 +775,20 @@ async function doVerify(){
   } catch(e) {
     setLoading(false);
     showErr('verifyErr', e.message||'Verification failed. Please check your date of birth.');
+    // DOB didn't match any record on this email — offer the shared-email
+    // new-patient path (e.g. a sibling registering on a parent's email).
+    if(mode!=='view')document.getElementById('verifyNewPt').classList.remove('hidden');
   }
 }
+function startNewOnSharedEmail(){
+  // curEmail already set from the email step — route through terms → patient-start
+  document.getElementById('verifyNewPt').classList.add('hidden');
+  document.getElementById('verifyPicker').classList.add('hidden');
+  document.getElementById('f_terms_accept').checked=false;
+  updateTermsBtn();
+  showV('vTermsAccept');
+}
+function escHtml(v){return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 // ── INTAKE FLOW ────────────────────────────────────────────────────────
 function nextStep(data){
